@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -euo pipefail
 LOCKDIR=/tmp/kyiv_estate_incremental_parser.lock
 FULL_LOCK=/tmp/kyiv_estate_apartments_full_backfill.lock
@@ -11,7 +12,7 @@ if ! mkdir "$LOCKDIR" 2>/dev/null; then
 fi
 printf '%s\n' "$$" > "$LOCKDIR/pid"
 trap 'rm -f "$LOCKDIR/pid"; rmdir "$LOCKDIR"' EXIT INT TERM
-cd /Users/admin/Projects/real-estate-platform/telegram-bot
+cd ${KYIV_ESTATE_HOME:?}
 source venv/bin/activate
 export OLX_MAX_PAGES=1
 export RIELTOR_MAX_PAGES=1

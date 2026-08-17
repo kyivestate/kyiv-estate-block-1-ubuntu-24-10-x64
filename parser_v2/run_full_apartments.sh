@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 FULL_LOCK=/tmp/kyiv_estate_apartments_full_backfill.lock
 INCREMENTAL_LOCK=/tmp/kyiv_estate_incremental_parser.lock
 mkdir -p "$PROJECT/logs"
@@ -17,5 +18,3 @@ python parser_v2/scripts/run_all.py
 if ! python parser_v2/scripts/sync_listing_lifecycle.py; then
   echo "lifecycle_sync_skipped: workbook size/API error; Active data is intact" >&2
 fi
-launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.incremental_parser.plist 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.houses.full_backfill.plist 2>/dev/null || true

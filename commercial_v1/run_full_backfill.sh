@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 SOURCE="$1"
 OPERATION="$2"
 LOCK="/tmp/kyiv_estate_commercial_backfill_${SOURCE}_${OPERATION}.lock"

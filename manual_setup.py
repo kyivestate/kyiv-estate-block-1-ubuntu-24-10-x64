@@ -1,13 +1,14 @@
 """Create safe manual-input tabs in every Active workbook without touching listings."""
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 import gspread
 from google.oauth2.service_account import Credentials
 from manual_v1 import MANUAL_HEADERS, MANUAL_TAB
 
 ROOT=Path(__file__).resolve().parent
-CREDS=ROOT.parent/'olx-parser'/'ads-collector'/'real-estate-platform-484610-a5a172df3957.json'
+CREDS=Path(os.environ['GOOGLE_CREDENTIALS_FILE'])
 BOOKS={
  'apartments':'1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8',
  'houses':'1BeIvPPeem-CWYgl2pS1pf1_CxMllcxXCaIstB5IonFY',

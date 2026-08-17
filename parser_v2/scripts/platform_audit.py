@@ -12,7 +12,7 @@ from google.oauth2.service_account import Credentials
 
 ACTIVE_SHEET_ID = "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8"
 LIFECYCLE_SHEET_ID = "1B0O2rTAcbfrrMxE1XX-lHDhqi2qt_Mg-U5usql975gg"
-CREDS = "/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json"
+CREDS = os.environ["GOOGLE_CREDENTIALS_FILE"]
 FIELDS = [
     "rooms", "area", "floor", "floors_total", "district", "city", "street",
     "residential_complex", "metro_station", "photo_url", "description", "ai_title",

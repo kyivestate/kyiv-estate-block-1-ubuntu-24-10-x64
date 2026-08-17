@@ -14,19 +14,17 @@ from urllib.request import urlopen
 import requests
 
 
-UID = os.getuid()
 LABELS = (
-    "com.kyivestate.media-server",
-    "com.kyivestate.media-archive",
-    "com.kyivestate.duckdns",
-    "com.kyivestate.tailscaled",
+    "kyiv-estate-media.service",
+    "kyiv-estate-block2.service",
+    "kyiv-estate-guard.service",
 )
-PROJECT = Path("/Users/admin/Projects/real-estate-platform/telegram-bot")
+PROJECT = Path(os.environ["KYIV_ESTATE_HOME"])
 REPORT = PROJECT / "logs" / "operations_watchdog.json"
 
 
-def launchctl(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(["launchctl", *args], text=True, capture_output=True, check=False)
+def service_state(label: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(["systemctl", "is-active", label], text=True, capture_output=True, check=False)
 
 
 def check_media() -> str:
@@ -41,11 +39,11 @@ def check_media() -> str:
 
 
 def check_socket() -> str:
-    path = "/Users/admin/Library/Application Support/KyivEstate/tailscaled.sock"
+    path = os.getenv("TAILSCALE_SOCKET", "/var/run/tailscale/tailscaled.sock")
     if not Path(path).exists():
         return "service_unavailable"
     result = subprocess.run(
-        ["/opt/homebrew/bin/tailscale", f"--socket={path}", "status", "--json"],
+        ["tailscale", f"--socket={path}", "status", "--json"],
         text=True,
         capture_output=True,
         check=False,
@@ -71,9 +69,9 @@ def check_duckdns() -> str:
 
 def ensure_funnel() -> str:
     """Enable the HTTPS media endpoint as soon as its one-time account approval exists."""
-    socket_path = "/Users/admin/Library/Application Support/KyivEstate/tailscaled.sock"
+    socket_path = os.getenv("TAILSCALE_SOCKET", "/var/run/tailscale/tailscaled.sock")
     result = subprocess.run(
-        ["/opt/homebrew/bin/tailscale", f"--socket={socket_path}", "funnel", "--bg", "--yes", "8787"],
+        ["tailscale", f"--socket={socket_path}", "funnel", "--bg", "--yes", "8787"],
         text=True,
         capture_output=True,
         check=False,
@@ -89,8 +87,8 @@ def main() -> int:
     report: dict[str, object] = {"checked_at": datetime.now(timezone.utc).isoformat(), "services": {}}
     services: dict[str, str] = {}
     for label in LABELS:
-        result = launchctl("print", f"gui/{UID}/{label}")
-        services[label] = "loaded" if result.returncode == 0 else "missing"
+        result = service_state(label)
+        services[label] = result.stdout.strip() if result.returncode == 0 else "missing"
     report["services"] = services
     report["media_server"] = check_media()
     report["tailscale"] = check_socket()
@@ -101,8 +99,8 @@ def main() -> int:
     report["duckdns_hostname"] = check_duckdns()
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    if report["media_server"] != "ok" and services["com.kyivestate.media-server"] == "loaded":
-        launchctl("kickstart", "-k", f"gui/{UID}/com.kyivestate.media-server")
+    if report["media_server"] != "ok" and services["kyiv-estate-media.service"] == "active":
+        subprocess.run(["systemctl", "restart", "kyiv-estate-media.service"], check=False)
         time.sleep(2)
         report["media_server_after_restart"] = check_media()
         REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")

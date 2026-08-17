@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT=/Users/admin/Projects/real-estate-platform/telegram-bot
+PROJECT=${KYIV_ESTATE_HOME:?}
 LOCKDIR=/tmp/kyiv_estate_findly_incremental.lock
 if ! mkdir "$LOCKDIR" 2>/dev/null; then exit 0; fi
 trap 'rmdir "$LOCKDIR"' EXIT INT TERM

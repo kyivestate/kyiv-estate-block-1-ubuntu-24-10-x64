@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 LOCK="/tmp/kyiv_estate_commercial_sheets_sync.lock"
 mkdir -p "$PROJECT/logs"
 if ! mkdir "$LOCK" 2>/dev/null; then

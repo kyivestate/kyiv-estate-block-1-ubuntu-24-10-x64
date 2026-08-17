@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-project_dir="/Users/admin/Projects/real-estate-platform/telegram-bot"
+project_dir="${KYIV_ESTATE_HOME:?}"
 cd "$project_dir"
 
 lock_dir="/tmp/kyiv_estate_media_archive.lock"

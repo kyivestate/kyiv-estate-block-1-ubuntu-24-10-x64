@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 FULL_LOCK=/tmp/kyiv_estate_houses_full_backfill.lock
 INCREMENTAL_LOCK=/tmp/kyiv_estate_houses_incremental.lock
 APARTMENTS_FULL_LOCK=/tmp/kyiv_estate_apartments_full_backfill.lock
@@ -17,5 +18,3 @@ python -m houses_v1.pipeline --source rieltor --operation all --refresh-existing
 python -m houses_v1.refresh_ai
 python -m houses_v1.sync_sheets
 python -m houses_v1.audit
-launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.houses.incremental_parser.plist 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.commercial.full_backfill.plist 2>/dev/null || true

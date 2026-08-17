@@ -11,7 +11,7 @@ import psycopg2
 import psycopg2.extras
 from flask import Flask, abort, make_response, send_file
 
-ROOT = Path(os.getenv("MEDIA_ARCHIVE_ROOT", "/Users/admin/KyivEstateMedia")).resolve()
+ROOT = Path(os.environ["MEDIA_ARCHIVE_ROOT"]).resolve()
 PUBLIC_BASE = os.getenv("MEDIA_PUBLIC_BASE", "https://macbook-pro-4.taila50e89.ts.net").rstrip("/")
 TABLES = {
     "apartments": "active_listings",

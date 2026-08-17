@@ -1,0 +1,17 @@
+[Unit]
+Description=Kyiv Estate Block 2 guard
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kyivestate
+Group=kyivestate
+WorkingDirectory=/opt/kyiv-estate-block-2
+EnvironmentFile=/etc/kyiv-estate/block-2.env
+ExecStart=/opt/kyiv-estate-block-2/scripts_guard.sh
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

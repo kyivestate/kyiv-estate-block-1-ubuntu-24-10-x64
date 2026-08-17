@@ -1,0 +1,17 @@
+[Unit]
+Description=Kyiv Estate media server
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kyivestate
+Group=kyivestate
+WorkingDirectory=/opt/kyiv-estate-block-2
+EnvironmentFile=/etc/kyiv-estate/block-2.env
+ExecStart=/opt/kyiv-estate-block-2/venv/bin/python /opt/kyiv-estate-block-2/telegraph_v3/media_server.py
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

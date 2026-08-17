@@ -22,7 +22,7 @@ from gspread.utils import ValueRenderOption
 from parser_v2.services.sheets_lock import SheetsLock
 
 
-CREDS = "/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json"
+CREDS = os.environ["GOOGLE_CREDENTIALS_FILE"]
 BOOKS = {
     "apartments": ("1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8", ("Оренда", "Продаж", "Ручне додавання")),
     "houses": ("1BeIvPPeem-CWYgl2pS1pf1_CxMllcxXCaIstB5IonFY", ("Оренда", "Продаж", "Ручне додавання")),

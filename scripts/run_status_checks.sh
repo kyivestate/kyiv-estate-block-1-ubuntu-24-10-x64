@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 cd "$PROJECT"
 source venv/bin/activate
 

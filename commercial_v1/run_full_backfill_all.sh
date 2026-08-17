@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 FULL_LOCK="/tmp/kyiv_estate_commercial_full_backfill.lock"
 SUPERVISOR_LOCK="/tmp/kyiv_estate_commercial_full_backfill_supervisor.lock"
 INCREMENTAL_LOCK="/tmp/kyiv_estate_commercial_incremental.lock"

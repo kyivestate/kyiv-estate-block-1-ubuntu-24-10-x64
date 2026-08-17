@@ -1,4 +1,5 @@
+#!/usr/bin/env bash
 set -euo pipefail
-ROOT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+ROOT="${KYIV_ESTATE_HOME:?}"
 cd "$ROOT"
 exec "$ROOT/venv/bin/python" -m cleaning.backfill_inactive --batch-size 250 --batches 10

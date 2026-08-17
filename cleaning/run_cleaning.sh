@@ -7,7 +7,7 @@ for full_lock in /tmp/kyiv_estate_apartments_full_backfill.lock /tmp/kyiv_estate
 done
 if ! mkdir "$LOCK" 2>/dev/null; then exit 0; fi
 trap 'rmdir "$LOCK"' EXIT INT TERM
-cd /Users/admin/Projects/real-estate-platform/telegram-bot
+cd ${KYIV_ESTATE_HOME:?}
 source venv/bin/activate
 if [ "$backfill_active" -eq 1 ]; then
   export CLEANING_LIMIT_PER_SCOPE="${CLEANING_LIMIT_DURING_BACKFILL:-10}"

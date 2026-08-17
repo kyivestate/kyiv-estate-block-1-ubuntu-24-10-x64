@@ -14,7 +14,7 @@ from manual_v1 import active_records, capture_sheet_notes
 
 load_dotenv(Path(__file__).with_name('.env'))
 DB = dict(host='localhost', port=5432, dbname='real_estate', user='admin')
-CREDS = os.getenv('GOOGLE_CREDENTIALS_FILE', '/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json')
+CREDS = os.environ['GOOGLE_CREDENTIALS_FILE']
 SHEET_ID = os.getenv('HOUSES_ACTIVE_SHEET_ID', '')
 HEADERS = ['ID','Ext ID','Фото','Source','Operation','Property Type','URL','Title','AI Title','Description','AI Description','UAH','USD','EUR','Rooms','Area','Floor','Floors Total','District','City','Street','Residential Complex','Metro','Agent Type','Agent Name','Agent Phone','Commission','Created At','Updated At','Коментарі']
 

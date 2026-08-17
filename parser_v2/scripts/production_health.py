@@ -11,7 +11,7 @@ from pathlib import Path
 import psycopg2
 
 
-PROJECT = Path("/Users/admin/Projects/real-estate-platform/telegram-bot")
+PROJECT = Path(os.environ["KYIV_ESTATE_HOME"])
 SERVICES = (
     "com.realestate.incremental_parser",
     "com.realestate.houses.incremental_parser",
@@ -37,20 +37,17 @@ def age_seconds(path):
 
 def service_state(label):
     result = subprocess.run(
-        ["launchctl", "print", f"gui/{os.getuid()}/{label}"],
+        ["systemctl", "is-active", label],
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         check=False,
     )
-    output = result.stdout
-    state = re.search(r"^\s*state = (.+)$", output, re.MULTILINE)
-    pid = re.search(r"^\s*pid = (\d+)", output, re.MULTILINE)
-    last_exit_code = re.search(r"^\s*last exit code = (\d+)", output, re.MULTILINE)
+    output = result.stdout.strip()
     return {
-        "state": state.group(1).strip() if state else "missing",
-        "pid": int(pid.group(1)) if pid else None,
-        "last_exit_code": int(last_exit_code.group(1)) if last_exit_code else None,
+        "state": output or "missing",
+        "pid": None,
+        "last_exit_code": None,
         "exit_code": result.returncode,
     }
 

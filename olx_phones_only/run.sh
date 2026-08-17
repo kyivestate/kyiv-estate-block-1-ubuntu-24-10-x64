@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-cd /Users/admin/Projects/real-estate-platform/telegram-bot/olx_phones_only
+cd ${KYIV_ESTATE_HOME:?}/olx_phones_only
 
 source ../venv/bin/activate 2>/dev/null || python3 -m venv ../venv && source ../venv/bin/activate
 pip install -r requirements.txt

@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", date
 log = logging.getLogger("run_all")
 
 DB = dict(host="localhost", port=5432, dbname="real_estate", user="admin")
-CREDS = "/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json"
+CREDS = os.environ["GOOGLE_CREDENTIALS_FILE"]
 SHEET_ID = "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8"
 
 HEADERS = [

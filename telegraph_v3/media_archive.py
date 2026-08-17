@@ -23,7 +23,7 @@ import psycopg2.extras
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHIVE_ROOT = Path(os.getenv("MEDIA_ARCHIVE_ROOT", "/Users/admin/KyivEstateMedia"))
+ARCHIVE_ROOT = Path(os.environ["MEDIA_ARCHIVE_ROOT"])
 MIN_FREE_BYTES = int(os.getenv("MEDIA_ARCHIVE_MIN_FREE_GB", "50")) * 1024**3
 CATALOGS = {"apartments": "active_listings", "houses": "houses_listings", "commercial": "commercial_listings"}
 ACCEPTED = {"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp"}

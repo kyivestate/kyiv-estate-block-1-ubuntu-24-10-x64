@@ -11,6 +11,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -33,7 +34,7 @@ from parser_v2.services.sheets_lock import SheetsLock
 
 
 DB = dict(host="localhost", port=5432, dbname="real_estate", user="admin")
-CREDS = Path("/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json")
+CREDS = Path(os.environ["GOOGLE_CREDENTIALS_FILE"])
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 BOOKS = {
     "apartments": {"id": "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8", "phone_header": "Agent Phone"},

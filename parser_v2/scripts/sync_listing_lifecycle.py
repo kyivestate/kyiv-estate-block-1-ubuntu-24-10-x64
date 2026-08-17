@@ -17,7 +17,7 @@ from parser_v2.services.sheets_lock import SheetsLock
 
 ACTIVE_SHEET_ID = "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8"
 LIFECYCLE_SHEET_ID = "1B0O2rTAcbfrrMxE1XX-lHDhqi2qt_Mg-U5usql975gg"
-CREDS = "/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json"
+CREDS = os.environ["GOOGLE_CREDENTIALS_FILE"]
 TABS = {"rent": "Оренда", "buy": "Продаж"}
 HEADERS = [
     "ID", "Джерело", "Тип угоди", "Статус", "Фото", "Тип нерухомості", "URL",

@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 set -uo pipefail
 
-PROJECT="$HOME/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 LOCKDIR=/tmp/kyiv_estate_guard.lock
 
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
@@ -128,7 +129,7 @@ while true; do
     fi
 
     QUALITY_MARKER="$PROJECT/.last_qfilter"
-    if [ ! -f "$QUALITY_MARKER" ] || [ $(( $(date +%s) - $(stat -f %m "$QUALITY_MARKER") )) -gt 21600 ]; then
+    if [ ! -f "$QUALITY_MARKER" ] || [ $(( $(date +%s) - $(stat -c %Y "$QUALITY_MARKER") )) -gt 21600 ]; then
       if "$PYTHON" parser_v2/scripts/quality_filter.py >> logs/qfilter.log 2>&1; then
         touch "$QUALITY_MARKER"
         log_event "quality_filter_complete"

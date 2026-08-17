@@ -1,9 +1,10 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="${PROJECT:-$HOME/Projects/real-estate-platform/telegram-bot}"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 BACKUP_ROOT="$PROJECT/backups/production"
-PG_DUMP="/Applications/Postgres.app/Contents/Versions/latest/bin/pg_dump"
-PG_RESTORE="/Applications/Postgres.app/Contents/Versions/latest/bin/pg_restore"
+PG_DUMP="$(command -v pg_dump)"
+PG_RESTORE="$(command -v pg_restore)"
 PYTHON="$PROJECT/venv/bin/python"
 STAMP="$(date '+%Y%m%d_%H%M%S')"
 DATABASE_TMP=""
@@ -16,12 +17,12 @@ umask 077
 DATABASE_TMP="$(mktemp "$BACKUP_ROOT/.real_estate_${STAMP}_XXXXXX.dump")"
 trap 'test -n "$DATABASE_TMP" && rm -f "$DATABASE_TMP"' EXIT
 
-"$PG_DUMP" --format=custom --no-owner --no-privileges --file="$DATABASE_TMP" -U admin real_estate
+"$PG_DUMP" --format=custom --no-owner --no-privileges --file="$DATABASE_TMP" --host="${PG_HOST:-127.0.0.1}" --port="${PG_PORT:-5432}" --username="${PG_USER:?}" "${PG_DBNAME:?}"
 "$PG_RESTORE" --list "$DATABASE_TMP" >/dev/null
 DATABASE_FILE="$BACKUP_ROOT/real_estate_${STAMP}.dump"
 mv "$DATABASE_TMP" "$DATABASE_FILE"
 DATABASE_TMP=""
-shasum -a 256 "$DATABASE_FILE" > "$DATABASE_FILE.sha256"
+sha256sum "$DATABASE_FILE" > "$DATABASE_FILE.sha256"
 SHEETS_BACKUP=""
 for attempt in $(seq 1 30); do
   CANDIDATE="$BACKUP_ROOT/.sheets_${STAMP}_${attempt}.partial"

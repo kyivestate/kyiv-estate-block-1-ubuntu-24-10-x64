@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
-cd /Users/admin/Projects/real-estate-platform/telegram-bot
+cd ${KYIV_ESTATE_HOME:?}
 
 if [ ! -d venv ]; then
   python3 -m venv venv

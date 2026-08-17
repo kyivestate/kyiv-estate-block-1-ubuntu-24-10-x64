@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
-project_dir="/Users/admin/Projects/real-estate-platform/telegram-bot"
+project_dir="${KYIV_ESTATE_HOME:?}"
 log_dir="$project_dir/logs"
 mkdir -p "$log_dir"
 exec "$project_dir/venv/bin/python" "$project_dir/telegraph_v3/sync_to_sheets.py" \

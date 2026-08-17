@@ -1,13 +1,14 @@
 """Apply one legible, fixed row height to every Active and Archive worksheet."""
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 import gspread
 from google.oauth2.service_account import Credentials
 from parser_v2.services.sheets_lock import SheetsLock
 
 ROOT=Path(__file__).resolve().parent
-CREDS=ROOT.parent/'olx-parser'/'ads-collector'/'real-estate-platform-484610-a5a172df3957.json'
+CREDS=Path(os.environ['GOOGLE_CREDENTIALS_FILE'])
 ROW_HEIGHT=42
 BOOKS={
  'apartments':'1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8',

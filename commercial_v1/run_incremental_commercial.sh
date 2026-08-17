@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 set -euo pipefail
-PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
+PROJECT="${KYIV_ESTATE_HOME:?}"
 LOCK="/tmp/kyiv_estate_commercial_incremental.lock"
 LOG="$PROJECT/logs/commercial_incremental.log"
 mkdir -p "$PROJECT/logs"

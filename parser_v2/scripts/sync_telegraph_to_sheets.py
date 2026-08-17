@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import random
 import re
 import sys
@@ -20,7 +21,7 @@ if str(ROOT) not in sys.path:
 
 from parser_v2.services.sheets_lock import SheetsLock
 
-CREDS = ROOT.parent / "olx-parser" / "ads-collector" / "real-estate-platform-484610-a5a172df3957.json"
+CREDS = Path(os.environ["GOOGLE_CREDENTIALS_FILE"])
 RESIDENTIAL_BOOK_ID = "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8"
 RESIDENTIAL_TABS = {"rent": "Оренда", "buy": "Продаж"}
 COMMERCIAL_CONFIG = ROOT / "commercial_v1" / ".sheets.json"

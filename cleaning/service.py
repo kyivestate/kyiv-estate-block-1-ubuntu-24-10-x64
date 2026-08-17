@@ -11,7 +11,7 @@ from manual_v1 import apply_schema
 
 load_dotenv(Path(__file__).with_name('.env'))
 ARCHIVE_ID=os.environ['CLEANING_ARCHIVE_SHEET_ID']
-CREDS='/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json'
+CREDS=os.environ['GOOGLE_CREDENTIALS_FILE']
 HEADERS=['Каталог','Архівовано','Причина','ID','Ext ID','Джерело','Операція','URL','Тип','Заголовок','AI Title','Опис','AI Опис','Ціна UAH','Ціна USD','Ціна EUR','Площа','Поверх','Поверхів','Район','Місто','Вулиця','Дані JSON']
 SCOPE={
  ('apartments','rent'):('active_listings','Квартири - Оренда',"property_type='Квартира'"),

@@ -16,7 +16,7 @@ from google.oauth2.service_account import Credentials
 from parser_v2.scripts.run_all import HEADERS, SHEET_ID, _cell_matches, row30
 
 
-CREDS = "/Users/admin/Projects/real-estate-platform/olx-parser/ads-collector/real-estate-platform-484610-a5a172df3957.json"
+CREDS = os.environ["GOOGLE_CREDENTIALS_FILE"]
 IGNORED_COLUMNS = {2, 27, 28, 30, 31}
 TABS = {"rent": "Оренда", "buy": "Продаж"}
 

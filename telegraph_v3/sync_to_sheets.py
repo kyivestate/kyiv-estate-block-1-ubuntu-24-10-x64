@@ -23,7 +23,7 @@ from parser_v2.services.sheets_lock import SheetsLock
 
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / "houses_v1" / ".env")
-CREDS = ROOT.parent / "olx-parser" / "ads-collector" / "real-estate-platform-484610-a5a172df3957.json"
+CREDS = Path(os.environ["GOOGLE_CREDENTIALS_FILE"])
 BOOKS = {
     "apartments": (os.getenv("ACTIVE_SHEET_ID", "1RY4BiRospnPYLFoW2LLJleDgi08yomwhtUlKKvSpkr8"), {"rent": "Оренда", "buy": "Продаж"}),
     "houses": (os.getenv("HOUSES_ACTIVE_SHEET_ID", ""), {"rent": "Оренда", "buy": "Продаж"}),
