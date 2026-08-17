@@ -16,7 +16,7 @@ import requests
 
 LABELS = (
     "kyiv-estate-media.service",
-    "kyiv-estate-block2.service",
+    "kyiv-estate-block1.service",
     "kyiv-estate-guard.service",
 )
 PROJECT = Path(os.environ["KYIV_ESTATE_HOME"])

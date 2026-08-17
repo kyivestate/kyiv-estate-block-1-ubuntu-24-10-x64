@@ -1,5 +1,5 @@
 [Unit]
-Description=Kyiv Estate Block 2 scheduler
+Description=Kyiv Estate Block 1 scheduler
 After=network-online.target postgresql.service
 Wants=network-online.target
 
@@ -7,9 +7,9 @@ Wants=network-online.target
 Type=simple
 User=kyivestate
 Group=kyivestate
-WorkingDirectory=/opt/kyiv-estate-block-2
-EnvironmentFile=/etc/kyiv-estate/block-2.env
-ExecStart=/opt/kyiv-estate-block-2/deploy/ubuntu-24.10-x64/scheduler.sh
+WorkingDirectory=/opt/kyiv-estate-block-1
+EnvironmentFile=/etc/kyiv-estate/block-1.env
+ExecStart=/opt/kyiv-estate-block-1/deploy/ubuntu-24.10-x64/scheduler.sh
 Restart=always
 RestartSec=15
 TimeoutStopSec=30

@@ -1,5 +1,5 @@
 [Unit]
-Description=Kyiv Estate Block 2 guard
+Description=Kyiv Estate Block 1 guard
 After=network-online.target postgresql.service
 Wants=network-online.target
 
@@ -7,9 +7,9 @@ Wants=network-online.target
 Type=simple
 User=kyivestate
 Group=kyivestate
-WorkingDirectory=/opt/kyiv-estate-block-2
-EnvironmentFile=/etc/kyiv-estate/block-2.env
-ExecStart=/opt/kyiv-estate-block-2/scripts_guard.sh
+WorkingDirectory=/opt/kyiv-estate-block-1
+EnvironmentFile=/etc/kyiv-estate/block-1.env
+ExecStart=/opt/kyiv-estate-block-1/scripts_guard.sh
 Restart=always
 RestartSec=15
 
