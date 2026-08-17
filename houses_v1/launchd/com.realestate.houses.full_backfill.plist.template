@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.realestate.houses.full_backfill</string>
+<key>ProgramArguments</key><array><string>/Users/admin/Projects/real-estate-platform/telegram-bot/houses_v1/run_full_houses.sh</string></array>
+<key>RunAtLoad</key><true/>
+<key>ProcessType</key><string>Background</string>
+<key>StandardOutPath</key><string>/Users/admin/Projects/real-estate-platform/telegram-bot/logs/houses_full_backfill.log</string>
+<key>StandardErrorPath</key><string>/Users/admin/Projects/real-estate-platform/telegram-bot/logs/houses_full_backfill.log</string>
+</dict></plist>

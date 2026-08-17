@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.realestate.commercial.incremental_parser</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/admin/Projects/real-estate-platform/telegram-bot/commercial_v1/run_incremental_commercial.sh</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>1800</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/admin/Projects/real-estate-platform/telegram-bot/logs/commercial_incremental.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/admin/Projects/real-estate-platform/telegram-bot/logs/commercial_incremental.log</string>
+</dict>
+</plist>
