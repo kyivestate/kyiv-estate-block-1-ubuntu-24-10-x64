@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 
 PROJECT=/Users/admin/Projects/real-estate-platform/telegram-bot

@@ -27,8 +27,8 @@ def get_conn():
 
 
 def source_rows(cur) -> list[dict[str, Any]]:
-    # Every SELECT is read-only. The final two fields distinguish a confirmed
-    # public contact from a phone-shaped string that needs human validation.
+
+
     cur.execute(
         """
         SELECT 'apartments' AS catalog, id AS listing_id, lower(source) AS source,

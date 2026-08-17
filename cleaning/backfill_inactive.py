@@ -24,8 +24,8 @@ def main():
                     break
             print(f'historical archive complete: moved={moved}')
     except RuntimeError as exc:
-        # Sheets writes are intentionally serialized.  A later launchd cycle
-        # will retry once the current sync/reconcile job has released the lock.
+
+
         print(f'historical_archive_deferred={exc}')
 
 if __name__=='__main__': main()

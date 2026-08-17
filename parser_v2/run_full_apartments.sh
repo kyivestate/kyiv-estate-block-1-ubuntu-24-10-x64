@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
 FULL_LOCK=/tmp/kyiv_estate_apartments_full_backfill.lock
@@ -15,11 +14,8 @@ python -m parser_v2.pipeline_v2 --source all --operation all --property-scope ap
 python parser_v2/scripts/deduplicate_listings.py
 python parser_v2/scripts/fill_new_listings.py
 python parser_v2/scripts/run_all.py
-# Lifecycle is a reporting mirror.  A full Active-data collection must not be
-# marked failed merely because the legacy Lifecycle workbook has hit its size limit.
 if ! python parser_v2/scripts/sync_listing_lifecycle.py; then
   echo "lifecycle_sync_skipped: workbook size/API error; Active data is intact" >&2
 fi
-# Resume the lightweight apartment cycle and hand the next full pass to houses.
 launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.incremental_parser.plist 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" /Users/admin/Library/LaunchAgents/com.realestate.houses.full_backfill.plist 2>/dev/null || true

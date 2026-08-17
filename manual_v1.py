@@ -55,8 +55,8 @@ def _manual_ai(catalog: str, operation: str, kind: str, title: str, description:
     property_type='Будинок' if catalog == 'houses' else 'Квартира'
     row={'operation':operation,'property_type':property_type,'title':title,'description':description,
          'district':district,'street':street,'area':area}
-    # The AI description keeps the source description as "Деталі об’єкта" and
-    # adds a structured introduction/location block rather than replacing it.
+
+
     ai_description=fallback_detailed_description(row,description) if description.strip() else residential_ai_summary(row)
     return property_type, residential_ai_title(row), ai_description
 

@@ -35,9 +35,9 @@ def main():
             updated = 0
             for row in rows:
                 source_description = clean_source_description(row.get("description"))
-                # ``fallback_detailed_description`` also safely renders listings
-                # with only structured source fields; do not leave those cards
-                # without AI copy merely because a portal omitted prose.
+
+
+
                 values = {}
                 if not row.get("ai_title") or len(row["ai_title"].strip()) < 18:
                     values["ai_title"] = build_title(row)

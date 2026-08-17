@@ -32,8 +32,8 @@ PUBLIC_TEL_HREF = re.compile(r"<a\\b[^>]*\\bhref\\s*=\\s*['\"]\\s*tel:([^'\"?#<]
 
 
 def public_phones(raw_html: str) -> list[str]:
-    # Most OLX pages have no public number. Avoid parsing large page bodies
-    # unless the literal link scheme exists at all.
+
+
     if "tel:" not in raw_html:
         return []
     phones: list[str] = []

@@ -104,10 +104,10 @@ def worksheet_for(client, catalog: str, operation: str):
 
 
 def output_indexes(ws, catalog: str) -> tuple[int, dict[str, int]]:
-    # A legacy Telegraph writer once appended duplicate output columns to the
-    # commercial workbook.  Cap the physical grid before reading headers so
-    # the 5-minute sync cannot recreate a 400+ column sheet and exhaust the
-    # Google Sheets 10-million-cell workbook limit.
+
+
+
+
     if catalog == "commercial" and ws.col_count > COMMERCIAL_APPROVED_COLUMNS:
         retry(lambda: ws.resize(cols=COMMERCIAL_APPROVED_COLUMNS))
     header = retry(lambda: ws.row_values(1))

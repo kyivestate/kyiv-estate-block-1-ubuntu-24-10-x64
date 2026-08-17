@@ -51,8 +51,8 @@ def apply(rows: list[dict]) -> None:
     if not rows:
         return
     with get_conn() as conn, SheetsLock("houses_policy_archive"):
-        # Re-read after taking the Sheets lock so the report and change use the
-        # current state, not a stale selection.
+
+
         rows = candidates(conn)
         report(rows)
         if not rows:
@@ -85,8 +85,8 @@ def apply(rows: list[dict]) -> None:
                     (row["id"],),
                 )
         conn.commit()
-        # Exact-ID deletion is deliberate: it cannot remove other houses or
-        # user-created rows in the same Active tab.
+
+
         for operation in ("rent", "buy"):
             identifiers = [row["id"] for row in rows if row["operation"] == operation]
             if identifiers:

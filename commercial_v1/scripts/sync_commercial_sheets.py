@@ -106,8 +106,8 @@ def record(row: dict) -> list[str]:
 
 def update_rows(ws, updates: list[tuple[int, list[str]]]) -> int:
     for offset in range(0, len(updates), 10):
-        # The final column is a user-owned comment and is intentionally not
-        # written by the parser.
+
+
         payload = [{"range": f"A{row}:{column_name(len(HEADERS)-1)}{row}", "values": [values[:-1]]} for row, values in updates[offset:offset + 10]]
         if payload:
             sheets_retry(lambda: ws.batch_update(payload, value_input_option="USER_ENTERED"))
@@ -116,11 +116,11 @@ def update_rows(ws, updates: list[tuple[int, list[str]]]) -> int:
 
 
 def delete_rows(ws, positions: list[int]) -> int:
-    # Clear stale Active values without changing physical row coordinates.
-    # deleteDimension forces Google to recalculate thousands of IMAGE formulas
-    # and has repeatedly hung for 20+ minutes.  Blank grid rows are harmless;
-    # clearing A:BF removes the listing ID and every approved data/output field
-    # immediately while keeping every surviving ID on its original row.
+
+
+
+
+
     ordered = sorted(set(positions), reverse=True)
     ranges: list[list[int]] = []
     for position in ordered:
@@ -143,12 +143,12 @@ def rows_match(existing: list[object], expected: list[object]) -> bool:
     A strict Python comparison made every numeric commercial listing appear
     changed and held the global Sheets writer lock for many minutes.
     """
-    ignored = {2, 51, 52, 53}  # IMAGE and technical timestamps
-    for index, value in enumerate(expected[:-1]):  # final field is user comments
+    ignored = {2, 51, 52, 53}
+    for index, value in enumerate(expected[:-1]):
         if index in ignored:
             continue
         current = existing[index] if index < len(existing) else ""
-        if index == 2:  # IMAGE formula rendering can differ without data change
+        if index == 2:
             continue
         left = str(current).strip().lstrip("'")
         right = str(value).strip().lstrip("'")
@@ -209,9 +209,9 @@ def enforce_column_ceiling(ws) -> None:
     approved_columns = len(HEADERS) + 2
     if ws.col_count <= approved_columns:
         return
-    # Worksheet.resize updates both Google and gspread's in-memory grid
-    # metadata.  A raw deleteDimension left ws.col_count stale; subsequent API
-    # calls could then recreate the historical 464-column grid.
+
+
+
     sheets_retry(lambda: ws.resize(cols=approved_columns))
 
 
@@ -250,7 +250,7 @@ def sync_tab(ws, rows: list[dict], allow_delete: bool) -> dict:
             appends.append(values)
         elif not rows_match(present[1], values):
             updates.append((present[0], values))
-    # Existing row numbers are valid only before any stale-row deletion.
+
     updated = update_rows(ws, updates)
     removed = 0
     if allow_delete and expected:
@@ -286,10 +286,10 @@ def main() -> int:
                 operation: config["active"].get("tabs", {}).get(operation, TABS[0] if operation == "rent" else TABS[1])
                 for operation in ("rent", "buy")
             }
-            # Trim every Active tab after the lock is acquired.  Otherwise a
-            # legacy writer can inflate the not-yet-processed sale tab while
-            # this process is waiting, causing the rent append to hit the
-            # workbook-wide 10-million-cell limit before sale is reached.
+
+
+
+
             for tab in set(active_tabs.values()):
                 enforce_column_ceiling(active.worksheet(tab))
             for operation in ("rent", "buy"):
@@ -297,8 +297,8 @@ def main() -> int:
                 active_result = sync_tab(active.worksheet(active_tab), rows_for(operation), allow_delete=True)
                 result[operation] = active_result
     except RuntimeError as exc:
-        # The shared lock serializes all workbook writers.  Contention is
-        # expected during the 30-minute parallel cycles, not a failed parser.
+
+
         if str(exc).startswith("Sheets writer already running:"):
             print(json.dumps({"status": "skipped", "reason": str(exc)}, ensure_ascii=False))
             return 0

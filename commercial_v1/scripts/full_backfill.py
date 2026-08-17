@@ -115,10 +115,10 @@ def main() -> None:
                 print(json.dumps(state, ensure_ascii=False), flush=True)
                 pages_left -= 1
             except (psycopg2.OperationalError, psycopg2.InterfaceError) as exc:
-                # PostgreSQL can restart during a multi-hour full pass.  The
-                # checkpoint is only advanced after commit, so replaying this
-                # page is safe (all writes are UPSERTs) and prevents coverage
-                # from stopping at an arbitrary deep page.
+
+
+
+
                 state["last_error"] = str(exc)[:500]
                 save_state(state)
                 reconnect_attempts += 1

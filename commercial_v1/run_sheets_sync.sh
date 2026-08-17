@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 PROJECT="/Users/admin/Projects/real-estate-platform/telegram-bot"
 LOCK="/tmp/kyiv_estate_commercial_sheets_sync.lock"

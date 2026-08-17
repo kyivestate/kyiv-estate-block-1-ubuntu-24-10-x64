@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 LOCKDIR=/tmp/kyiv_estate_houses_incremental.lock
 FULL_LOCK=/tmp/kyiv_estate_houses_full_backfill.lock

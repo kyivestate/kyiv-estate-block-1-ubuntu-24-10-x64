@@ -13,8 +13,8 @@ KYIV_CITY_TOKENS = (
     "святошин", "солом", "шевченк",
 )
 
-# Oblast name covers every settlement when a portal includes the administrative
-# region. The settlement aliases cover feeds that show only a locality.
+
+
 KYIV_OBLAST_TOKENS = (
     "київська область", "киевская область", "київ обл", "киев обл",
     "біла церква", "белая церковь", "борисп", "бровар", "буч", "васильк",

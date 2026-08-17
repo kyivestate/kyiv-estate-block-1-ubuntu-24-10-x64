@@ -94,9 +94,9 @@ def main() -> int:
     report["services"] = services
     report["media_server"] = check_media()
     report["tailscale"] = check_socket()
-    # Funnel authorization is account-level and must be approved in Tailscale once.
-    # A pending `tailscale funnel` command remains active independently until that
-    # approval arrives; the watchdog must never block a later audit on it.
+
+
+
     report["funnel"] = "pending_account_approval" if report["tailscale"] == "ready" else "waiting_for_login"
     report["duckdns_hostname"] = check_duckdns()
     REPORT.parent.mkdir(parents=True, exist_ok=True)

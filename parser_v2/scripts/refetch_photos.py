@@ -1,4 +1,4 @@
-                      
+
 import sys, os, time, re, logging, argparse, json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import psycopg2, psycopg2.extras

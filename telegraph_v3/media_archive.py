@@ -30,10 +30,10 @@ ACCEPTED = {"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "ima
 
 
 def db():
-    # Postgres.app can require an interactive permission dialog for TCP
-    # localhost connections launched by launchd.  The local Unix socket is
-    # authenticated as the current macOS user and keeps this unattended job
-    # independent of that dialog.
+
+
+
+
     return psycopg2.connect(host="/tmp", port=5432, dbname="real_estate", user="admin")
 
 
@@ -57,12 +57,12 @@ def ensure_schema(conn) -> None:
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS media_archive_status_idx ON block3.media_archive(status, checked_at)")
         cur.execute("CREATE INDEX IF NOT EXISTS media_archive_source_archived_idx ON block3.media_archive(source_url) WHERE status='archived'")
-        # Do not issue `ADD COLUMN IF NOT EXISTS` on every five-minute job.
-        # PostgreSQL still queues an ACCESS EXCLUSIVE lock for that statement;
-        # an archive batch intentionally keeps its read transaction open while
-        # downloading, so an audit could otherwise wait behind it and then
-        # stall every later reader.  Migrate only when the column is actually
-        # absent.
+
+
+
+
+
+
         cur.execute("""
             SELECT 1
             FROM information_schema.columns
@@ -116,10 +116,10 @@ def source_urls(conn, catalogs: list[str], limit: int) -> list[str]:
             """, (catalog,))
             for (value,) in cur.fetchall():
                 url = str(value or "").strip()
-                # This crawl can contain more than 100k images.  Membership
-                # in a list made selection O(n²), spending minutes of CPU
-                # before the first download.  Preserve deterministic order
-                # while deduplicating in O(1).
+
+
+
+
                 if url.startswith("https://") and url not in seen:
                     seen.add(url)
                     found.append(url)
@@ -147,9 +147,9 @@ def download_one(url: str) -> dict[str, Any]:
     digest = source_hash(url)
     headers = {"User-Agent": "Mozilla/5.0 (compatible; KyivEstateMediaArchive/1.0)", "Accept": "image/avif,image/webp,image/*,*/*;q=0.8"}
     try:
-        # A slow/dead image CDN must not monopolise one of the fixed worker
-        # slots during the accelerated backfill.  Retryable sources are
-        # revisited later; responsive images keep the durable queue moving.
+
+
+
         response = requests.get(url, headers=headers, timeout=(5, 15))
         response.raise_for_status()
         mime = response.headers.get("content-type", "").split(";", 1)[0].lower()
@@ -161,10 +161,10 @@ def download_one(url: str) -> dict[str, Any]:
         path = ARCHIVE_ROOT / key
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
-            # Multiple archive runs may encounter the same source URL.  A
-            # shared `*.part` name lets one worker rename another worker's
-            # temporary file and creates a false retry.  Use a unique file in
-            # the same directory so the final replace stays atomic.
+
+
+
+
             descriptor, temporary_name = tempfile.mkstemp(prefix=path.name + ".", suffix=".part", dir=path.parent)
             temporary = Path(temporary_name)
             try:

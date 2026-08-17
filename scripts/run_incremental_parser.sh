@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 LOCKDIR=/tmp/kyiv_estate_incremental_parser.lock
 FULL_LOCK=/tmp/kyiv_estate_apartments_full_backfill.lock
@@ -34,8 +33,6 @@ run_pipeline_with_deadline() {
 }
 run_pipeline_with_deadline
 python parser_v2/scripts/deduplicate_listings.py
-# Retry a small, balanced batch of previously transient apartment failures.
-# It acquires the pipeline lock itself, so a late/overlapping run safely skips.
 python -m parser_v2.scripts.retry_failed_urls --limit 80 --max-retries 3
 python parser_v2/scripts/fill_new_listings.py
 nohup python parser_v2/scripts/check_listing_statuses.py >> logs/status_checks.log 2>&1 &
@@ -50,8 +47,6 @@ done
 if [ "$main_synced" -ne 1 ]; then
   exit 1
 fi
-# Lifecycle is not an input to Active data.  Its oversized legacy workbook must
-# never keep the 30-minute apartment parser in a failing/retry loop.
 if ! python parser_v2/scripts/sync_listing_lifecycle.py; then
   echo "lifecycle_sync_skipped: workbook size/API error; Active sync succeeded" >&2
 fi

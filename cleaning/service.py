@@ -87,12 +87,12 @@ def archive_historical_scope(conn,b,catalog,operation,limit):
         print(f'{catalog}/{operation}: historical=0')
         return 0
 
-    # Write first, then record completion.  A failed write remains eligible for
-    # the next run; database state is never used to hide an unarchived listing.
+
+
     rows=attach_user_notes(conn,catalog,rows)
     ws=b.worksheet(tab)
-    # A process can fail after Google accepts an append but before Postgres is
-    # updated.  The ID column makes that retry safe without guessing.
+
+
     present={str(v).strip() for v in ws.col_values(4)[1:] if str(v).strip()}
     to_append=[r for r in rows if str(r['id']) not in present]
     if to_append:
@@ -103,7 +103,7 @@ def archive_historical_scope(conn,b,catalog,operation,limit):
               VALUES(%s,%s,%s,%s) ON CONFLICT DO NOTHING''',
               (catalog,row['id'],'historical_inactive',json.dumps(row,ensure_ascii=False,default=str)))
     conn.commit()
-    # Old inactive rows must no longer remain in the corresponding Active tab.
+
     remove_from_active(catalog,operation,[r['id'] for r in rows])
     print(f'{catalog}/{operation}: historical_archived={len(rows)} appended={len(to_append)}')
     return len(rows)
@@ -145,7 +145,7 @@ def process_scope(conn,b,catalog,operation,limit):
       if archived:
        archived=attach_user_notes(conn,catalog,archived)
        ws=b.worksheet(tab); ws.append_rows([row_values(catalog,r,'source removed after two HTTP confirmations') for r in archived],value_input_option='USER_ENTERED')
-       # remove only exact IDs from the matching Active tab (ID is column A in all active books)
+
        remove_from_active(catalog,operation,[r['id'] for r in archived])
       print(f'{catalog}/{operation}: checked={processed} archived={len(archived)}')
     finally:
@@ -158,8 +158,8 @@ def main():
       b=book(); archive_tabs(b)
       for catalog,operation in SCOPE: process_scope(conn,b,catalog,operation,limit)
   except RuntimeError as exc:
-    # A concurrent canonical Sheets writer is expected.  The next 30-minute
-    # pass resumes from the database state, so this is a successful skip.
+
+
     if str(exc).startswith('Sheets writer already running:'):
       print(f'cleaning_skipped={exc}')
       return

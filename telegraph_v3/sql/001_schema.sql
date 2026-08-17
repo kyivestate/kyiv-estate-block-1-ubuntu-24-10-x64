@@ -1,4 +1,3 @@
--- Block 3 publication ledger.  It is deliberately separate from Block 1 data.
 CREATE SCHEMA IF NOT EXISTS block3;
 
 CREATE TABLE IF NOT EXISTS block3.publications (
@@ -23,8 +22,6 @@ CREATE TABLE IF NOT EXISTS block3.publications (
     UNIQUE (catalog, source, external_id, operation)
 );
 
--- A provider-requested cooldown is state, not a transient process delay. This
--- keeps restarts and launchd invocations from repeatedly hitting Telegraph.
 ALTER TABLE block3.publications
     ADD COLUMN IF NOT EXISTS retry_after timestamptz;
 

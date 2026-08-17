@@ -38,7 +38,7 @@ class RieltorHttpClient:
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/125.0.0.0 Safari/537.36"
         })
         self._last_req: float = 0
-        self._min_delay = 8.0                            
+        self._min_delay = 8.0
 
     def _throttle(self) -> None:
         elapsed = time.time() - self._last_req

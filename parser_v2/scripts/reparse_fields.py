@@ -1,4 +1,4 @@
-                      
+
 """Reparse ONLY listings missing rooms/area/floor/district from live pages."""
 import sys, os, re, time, logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -38,7 +38,7 @@ def extract_from_html(html: str, source: str) -> dict:
     tl = text.lower()
 
     if source == "rieltor":
-                                           
+
         for row in soup.select("div.offer-view-details-row"):
             t = row.get_text().strip(); rtl = t.lower()
             if "кімнат" in rtl:
@@ -53,7 +53,7 @@ def extract_from_html(html: str, source: str) -> dict:
                 m = re.search(r"(\d+)\s*(?:з|із)\s*(\d+)", t)
                 if m: d["floor"] = int(m.group(1)); d["floors_total"] = int(m.group(2))
 
-                                
+
         for b in soup.find_all("b"):
             bt = b.get_text().strip().lower()
             nxt = b.next_sibling
@@ -79,7 +79,7 @@ def extract_from_html(html: str, source: str) -> dict:
                 m = re.search(r"(\d+)", val)
                 if m: d["floors_total"] = int(m.group(1))
 
-                                         
+
         region = soup.select_one("div.offer-view-region")
         if region:
             parts = [p.strip() for p in region.get_text().split(",")]
@@ -87,7 +87,7 @@ def extract_from_html(html: str, source: str) -> dict:
                 dist = parts[1].replace("р-н","").replace("район","").strip()
                 if dist: d["district"] = dist
 
-                                 
+
         og = soup.find("meta", property="og:description")
         if og:
             og_text = og.get("content","")
@@ -104,7 +104,7 @@ def extract_from_html(html: str, source: str) -> dict:
                     except: pass
 
     elif source == "olx":
-                                                       
+
         import json
         for s in soup.select('script[type="application/ld+json"]'):
             try:
@@ -121,7 +121,7 @@ def extract_from_html(html: str, source: str) -> dict:
                         d.setdefault("district", addr["addressLocality"])
             except: pass
 
-                                                               
+
         meta = soup.find("meta", {"name": "description"})
         if meta:
             mc = meta.get("content", "")
@@ -137,13 +137,13 @@ def extract_from_html(html: str, source: str) -> dict:
                 m = re.search(r"(?:Поверх|Этаж|Floor)[:=\s]*(\d+)", mc, re.I)
                 if m: d["floor"] = int(m.group(1))
 
-                                                  
+
     if "district" not in d:
         for canonical, aliases in KYIV_DISTRICTS.items():
             if any(a in tl for a in aliases):
                 d["district"] = canonical; break
 
-                                                          
+
     if "rooms" not in d:
         m = re.search(r"(\d)\s*[-]?\s*(?:кімнат|комнат|room)", text, re.I)
         if m: d["rooms"] = int(m.group(1))
@@ -161,20 +161,20 @@ def extract_from_html(html: str, source: str) -> dict:
             if 0 < fl < 80: d["floor"] = fl
             if 0 < ft < 80: d["floors_total"] = ft
 
-                 
+
     if source == "rieltor":
         desc_el = soup.select_one("div.offer-view-section-text")
         if desc_el:
             desc = desc_el.get_text().strip()
             if len(desc) > 30:
-                                    
+
                 bad = ["команда підтримки","будні з","вихідні з","робочий час"]
                 if not any(b in desc.lower() for b in bad):
-                    # Preserve the full source text when this maintenance tool
-                    # refreshes a listing; 49k is below the Sheets cell limit.
+
+
                     d["description"] = desc[:49000]
     elif source == "olx":
-                                          
+
         meta_d = soup.find("meta", {"name": "description"})
         if meta_d:
             desc = meta_d.get("content", "").strip()
@@ -219,7 +219,7 @@ def reparse_source(source: str):
                 stats["failed"] += 1; continue
 
             extracted = extract_from_html(html, source)
-                                     
+
             updates = {}
             if r.get("rooms") is None and "rooms" in extracted:
                 updates["rooms"] = extracted["rooms"]
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     for s in (["olx","rieltor"] if args.source == "all" else [args.source]):
         reparse_source(s)
 
-                  
+
     conn = psycopg2.connect(**DB)
     cur = conn.cursor()
     cur.execute("""SELECT source, operation,
@@ -281,4 +281,4 @@ if __name__ == "__main__":
     for r in cur.fetchall():
         log.info("  %s %s: rooms=%d area=%d floor=%d dist=%d desc=%d (of %d)", r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7])
     cur.close(); conn.close()
-                                                                        
+

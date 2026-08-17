@@ -32,7 +32,6 @@ CREATE INDEX IF NOT EXISTS idx_v2_norm_valid ON parser_v2_normalized_listings(is
 ALTER TABLE parser_v2_normalized_listings ADD COLUMN IF NOT EXISTS property_type TEXT DEFAULT 'Квартира';
 ALTER TABLE parser_v2_normalized_listings ADD COLUMN IF NOT EXISTS metro_station TEXT DEFAULT '';
 
--- Ensure unique constraint on active_listings for upsert
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='active_listings_source_external_id_key') THEN
         ALTER TABLE active_listings ADD CONSTRAINT active_listings_source_external_id_key UNIQUE (source, external_id);

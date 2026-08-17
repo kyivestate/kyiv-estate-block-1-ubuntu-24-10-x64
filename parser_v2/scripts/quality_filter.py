@@ -1,4 +1,4 @@
-                      
+
 """Professional listing quality filter — validates ALL active listings.
 Rules -> quarantine with reason. Run anytime, idempotent."""
 import sys, os, time, logging
@@ -12,7 +12,7 @@ conn = psycopg2.connect(host="localhost", port=5432, dbname="real_estate", user=
 cur = conn.cursor()
 
 RULES = [
-                                           
+
     ("rent_price_too_high",
      "operation='rent' AND price_uah > 500000"),
     ("rent_price_too_low",
@@ -23,28 +23,28 @@ RULES = [
      "operation='buy' AND price_usd > 5000000"),
     ("no_price",
      "price_uah IS NULL AND price_usd IS NULL"),
-                                                                                
+
     ("rent_price_per_m2_anomaly",
      "operation='rent' AND area IS NOT NULL AND area > 10 AND (price_uah/area < 150 OR price_uah/area > 6000)"),
     ("buy_price_per_m2_anomaly",
      "operation='buy' AND area IS NOT NULL AND area > 10 AND (price_usd/area < 500 OR price_usd/area > 15000)"),
-                                        
+
     ("area_rooms_mismatch",
      "rooms >= 3 AND area IS NOT NULL AND area < 40"),
     ("area_too_small",
      "area IS NOT NULL AND area < 11"),
     ("area_too_big",
      "area IS NOT NULL AND area > 800"),
-                              
+
     ("floor_above_total",
      "floor IS NOT NULL AND floors_total IS NOT NULL AND floor > floors_total"),
-                        
+
     ("garbage_title",
      "title IS NOT NULL AND (LENGTH(TRIM(title)) < 10 OR title ILIKE '%%тест%%' OR title ILIKE '%%test%%')"),
-             
+
     ("not_kyiv",
      "city IS NOT NULL AND city NOT IN ('Київ','Киев','Kyiv','') AND city NOT LIKE 'Київ%%'"),
-                                             
+
     ("not_apartment",
      "property_type IS NOT NULL AND property_type NOT IN ('Квартира','apartment','квартира','Будинок','house','будинок','')"),
 ]
@@ -64,7 +64,7 @@ for name, cond in RULES:
         log.info("  🔸 %s: %d -> quarantine", name, n)
 conn.commit()
 
-                                                                        
+
 cur.execute("""UPDATE active_listings SET status='active', comments=NULL
     WHERE status='quarantine' AND source NOT LIKE 'findly%%'
       AND comments IN ('rent_price_too_high','buy_price_too_low','no_price','price_anomaly_rent_high','price_below_filter','price_anomaly_buy_high')
@@ -81,7 +81,7 @@ cur.execute("""UPDATE active_listings SET status='active', comments=NULL
 restored += cur.rowcount
 conn.commit()
 
-                                                                                  
+
 cur.execute("""UPDATE active_listings SET status='quarantine', comments='cross_source_duplicate'
     WHERE id IN (
       SELECT a.id FROM active_listings a
@@ -101,7 +101,7 @@ cur.execute("""UPDATE active_listings SET status='quarantine', comments='cross_s
 dupes = cur.rowcount
 conn.commit()
 
-                                
+
 log.info("-" * 60)
 log.info("  Quarantined: %d | Restored: %d | Cross-source dupes: %d", total_q, restored, dupes)
 
@@ -114,7 +114,7 @@ log.info("  QUARANTINE REASONS:")
 for r in cur.fetchall():
     log.info("    %s: %d", r[0], r[1])
 
-             
+
 cur.execute("""SELECT count(*) as total,
     round(avg(data_completeness),1) as avg_q,
     count(*) FILTER (WHERE data_completeness >= 90) as premium

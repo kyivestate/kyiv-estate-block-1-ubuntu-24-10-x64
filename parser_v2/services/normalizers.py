@@ -24,9 +24,9 @@ def _regex_area(text: str) -> float | None:
 
 def _regex_floor(text: str) -> tuple[int | None, int | None]:
     floor_marker = r"(?:поверх|этаж|етаж|пов\.?|эт\.?)"
-    # Covers both `23/24 поверх` and the common OLX form `23эт/24эт`.
-    # The latter previously fell through to an address such as `37/1`,
-    # producing impossible floor values in otherwise valid apartments.
+
+
+
     m = re.search(
         rf"(\d{{1,2}})\s*{floor_marker}?\s*/\s*(\d{{1,2}})\s*{floor_marker}",
         text,
@@ -55,14 +55,14 @@ def _property_type_from_content(declared: str, title: str) -> str:
     value = clean_text(declared) or "Квартира"
     if value != "Квартира":
         return value
-    # Do not classify ordinary "квартира в будинку" as a house: require an
-    # offer-type phrase or a title beginning with a house subtype.
+
+
     if re.search(
         r"^\s*(?:будин\w*|котедж\w*|таунхаус\w*|дуплекс\w*)\b|"
-        # OLX frequently separates the offer type with `/`, `:` or `-`, e.g.
-        # "Оренда / Будинок".  Treat those separators exactly like whitespace,
-        # while retaining the offer-type requirement to avoid mistaking an
-        # apartment's address such as "будинок 7" for a detached house.
+
+
+
+
         r"\b(?:оренда|продаж|продається|здам|здається)[\s/:,-]+(?:будин\w*|котедж\w*|таунхаус\w*|дуплекс\w*)\b",
         title,
         re.IGNORECASE,
@@ -100,10 +100,10 @@ def normalize_listing(raw: RawListing, sd: dict) -> NormalizedListing:
     floor = extract_int(str(floor_s)) if floor_s else floor_r
     floor_total = extract_int(str(ft_s)) if ft_s else ft_r
     floor_confidence = "structured" if floor_s else ("regex" if floor_r else "missing")
-    # Structured fields in an OLX card can occasionally be polluted by a
-    # street number (`37/1`).  Prefer an explicit valid floor pair extracted
-    # from the listing body, and never publish a mathematically impossible
-    # floor when no reliable replacement exists.
+
+
+
+
     if floor is not None and floor_total is not None and floor > floor_total:
         if floor_r is not None and ft_r is not None and floor_r <= ft_r:
             floor, floor_total = floor_r, ft_r

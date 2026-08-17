@@ -107,14 +107,14 @@ class RieltorParser:
     def _extract(self, html: str, url: str) -> dict:
         soup = BeautifulSoup(html, "lxml"); d: dict = {"url": url}
 
-                                            
+
         pe = soup.select_one("div.offer-view-price-title")
         if pe: d["price_raw"] = clean_text(pe.get_text())
         if not d.get("price_raw"):
             pe2 = soup.select_one("div.offer-view-price")
             if pe2: d["price_raw"] = clean_text(pe2.get_text())
 
-                                                                
+
         addr_el = soup.select_one("div.offer-view-address")
         if addr_el: d["street"] = clean_text(addr_el.get_text())
 
@@ -124,13 +124,13 @@ class RieltorParser:
         region_el = soup.select_one("div.offer-view-region")
         if region_el:
             region_text = clean_text(region_el.get_text())
-                                                                 
+
             parts = [p.strip() for p in region_text.split(",")]
             if parts: d["city"] = parts[0]
             if len(parts) > 1:
                 dist = parts[1].replace("р-н", "").replace("район", "").strip()
                 d["district"] = dist
-                                          
+
         for a in soup.select("a.address-link"):
             txt = a.get_text().strip()
             if "р-н" in txt:
@@ -138,19 +138,19 @@ class RieltorParser:
             elif "вул." in txt or "просп." in txt or "бульв." in txt:
                 d.setdefault("street", txt)
 
-                                                                        
+
         detail_rows = soup.select("div.offer-view-details-row")
         for row in detail_rows:
             txt = clean_text(row.get_text()); tl = txt.lower()
-                                        
+
             if "кімнат" in tl:
                 m = re.search(r"(\d+)", txt)
                 if m: d["rooms"] = m.group(1)
-                                                           
+
             elif "м²" in tl or "м2" in tl:
                 m = re.search(r"([\d.,]+)\s*/", txt) or re.search(r"([\d.,]+)\s*м", txt)
                 if m: d["area"] = m.group(1).replace(",", ".")
-                             
+
             elif "поверх" in tl:
                 m = re.search(r"(\d+)\s*(?:з|із)\s*(\d+)", txt)
                 if m: d["floor"] = m.group(1); d["floors_total"] = m.group(2)
@@ -158,7 +158,7 @@ class RieltorParser:
                     m2 = re.search(r"(\d+)", txt)
                     if m2: d["floor"] = m2.group(1)
 
-                                                             
+
         if not d.get("rooms"):
             v = self._b_val(soup, "Кількість кімнат")
             m = re.search(r"(\d+)", v)
@@ -176,8 +176,8 @@ class RieltorParser:
             m = re.search(r"(\d+)", v)
             if m: d["floors_total"] = m.group(1)
 
-                                                               
-                                                               
+
+
         addr_block = soup.select_one("div.offer-view-address-block, div.offer-view-section.offer-view-address-block")
         if addr_block:
             title_el = addr_block.select_one("div.offer-view-section-title")
@@ -188,18 +188,18 @@ class RieltorParser:
                 elif rc_text and not any(w in rc_text.lower() for w in ["опис","планування","адрес"]):
                     d["residential_complex"] = rc_text
 
-                                            
+
         h1 = soup.select_one("h1")
         if h1: d["title"] = clean_text(h1.get_text())
         if not d.get("title"):
             gallery_title = soup.select_one("span.offer-photo-gallery__title")
             if gallery_title: d["title"] = clean_text(gallery_title.get_text())
 
-                                                  
+
         desc_el = soup.select_one("div.offer-view-section-text")
         if desc_el: d["description"] = clean_text(desc_el.get_text())
 
-                                                      
+
         name_el = soup.select_one("a.offer-view-rieltor-name")
         if name_el: d["contact_name"] = clean_text(name_el.get_text())
 
@@ -215,7 +215,7 @@ class RieltorParser:
             d["agency_name"] = clean_text(agency_el.get_text())
             d.setdefault("agent_type", "agency")
 
-                
+
         phones_el = soup.select_one("div.offer-view-rieltor-phones")
         if phones_el:
             phones_text = phones_el.get_text()
@@ -223,41 +223,41 @@ class RieltorParser:
             if phone_list:
                 d["contact_phone"] = phone_list[0].strip()
 
-                                                                               
+
         labels_el = soup.select_one("div.offer-view-labels")
         if labels_el:
             labels_text = clean_text(labels_el.get_text())
-                                       
+
             m = re.search(r"Комісія\s*([\d]+%?)", labels_text, re.IGNORECASE)
             if m: d["commission"] = f"Комісія {m.group(1)}"
             elif "без комісі" in labels_text.lower(): d["commission"] = "Без комісії"
-                                                                                       
+
             for span in labels_el.select("span, a"):
                 txt = span.get_text().strip()
                 if txt and "комісі" not in txt.lower() and len(txt) < 40:
                     d.setdefault("metro_station", txt)
                     break
 
-                                              
+
         photos = []
-                             
+
         for img in soup.select("div.offer-view-gallery img[src], div.offer-photo-gallery img[src]"):
             src = img.get("data-src") or img.get("src") or ""
             if src.startswith("http") and src not in photos: photos.append(src)
-                                        
+
         if not photos:
             for img in soup.select("img[src]"):
                 src = img.get("src") or ""
                 if "lunstatic" in src and src not in photos: photos.append(src)
         d["photos"] = photos[:20]
 
-                                
+
         og = soup.find("meta", property="og:image")
         if og: d["photo_url"] = og.get("content", "")
         if not d.get("photo_url") and photos: d["photo_url"] = photos[0]
 
-                                                               
-                                                                                      
+
+
         og_desc = soup.find("meta", property="og:description")
         if og_desc:
             og_text = og_desc.get("content", "")
@@ -277,7 +277,7 @@ class RieltorParser:
                     m2 = re.search(r"([\d.,]+)\s*м²", og_text)
                     if m2: d["area"] = m2.group(1).replace(",", ".")
 
-                                                              
+
         desc = d.get("description", "")
         if desc:
             if not d.get("residential_complex"):

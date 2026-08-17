@@ -174,14 +174,14 @@ def strict_issues(data):
     if guard["last_exit_code"] not in (None, 0):
         issues.append("service_failed:com.realestate.guard")
     log_age = data["files"]["incremental_log_age_seconds"]
-    # During a complete catalog pass the incremental process intentionally
-    # yields its lock; a quiet incremental log is therefore expected.
+
+
     if (log_age is None or log_age > 3900) and not data["full_coverage_in_progress"]:
         issues.append("incremental_log_stale")
     backup_age = data["files"]["backup_age_seconds"]
-    # The production snapshot runs daily at 03:15 and normally finishes in a
-    # few minutes.  A 26-hour ceiling catches a missed or incomplete backup
-    # without alerting merely because the job is between scheduled runs.
+
+
+
     if backup_age is None or backup_age > 26 * 60 * 60:
         issues.append("backup_stale")
     database = data["database"]

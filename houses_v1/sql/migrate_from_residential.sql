@@ -1,7 +1,6 @@
 BEGIN;
 SET LOCAL lock_timeout = '10s';
 
--- Preserve legacy IDs, so historical status/enrichment records can be moved losslessly.
 INSERT INTO houses_listings (id, external_id, source, operation, property_type, title, description, ai_description,
     price_uah, price_usd, price_eur, area, floor, floors_total, rooms, district, city, street, residential_complex,
     metro_station, url, photo_url, photos, commission, agent_type, agent_name, agent_phone, status, comments,
@@ -46,7 +45,6 @@ INSERT INTO houses_ai_content_rebuilds SELECT rebuilds.* FROM ai_content_rebuild
 JOIN active_listings listing ON listing.id=rebuilds.listing_id WHERE listing.property_type='Будинок'
 ON CONFLICT (listing_id) DO NOTHING;
 
--- Remove migrated house rows only after every destination copy succeeds in this transaction.
 DELETE FROM listing_status_checks USING active_listings WHERE listing_status_checks.listing_id=active_listings.id AND active_listings.property_type='Будинок';
 DELETE FROM listing_enrichment_attempts USING active_listings WHERE listing_enrichment_attempts.listing_id=active_listings.id AND active_listings.property_type='Будинок';
 DELETE FROM listing_live_enrichment_attempts USING active_listings WHERE listing_live_enrichment_attempts.listing_id=active_listings.id AND active_listings.property_type='Будинок';

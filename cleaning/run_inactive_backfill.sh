@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 ROOT="/Users/admin/Projects/real-estate-platform/telegram-bot"
 cd "$ROOT"

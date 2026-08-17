@@ -90,9 +90,9 @@ class OlxCommercialParser:
                     if not external_id:
                         continue
                     seen.add(url)
-                    # Both configured OLX catalogues are Kyiv city / Kyiv
-                    # oblast catalogues. Keep that provenance for the
-                    # normalizer because a rural card may show only a village.
+
+
+
                     result.append({"url": url, "external_id": external_id, "source_catalog": "kyiv_region"})
                     added += 1
                 if added == 0:

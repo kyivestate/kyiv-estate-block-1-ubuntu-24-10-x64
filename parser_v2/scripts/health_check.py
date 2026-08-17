@@ -1,4 +1,4 @@
-                      
+
 """Daily health report — run every morning."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -11,7 +11,7 @@ print("=" * 60)
 print(f"  KYIV ESTATE — DAILY HEALTH  {time.strftime('%Y-%m-%d %H:%M')}")
 print("=" * 60)
 
-              
+
 cur.execute("""SELECT status, count(*) FROM active_listings GROUP BY 1 ORDER BY 2 DESC""")
 print("\n📊 STATUS:")
 for r in cur.fetchall(): print(f"  {r['status']}: {r['count']}")
@@ -33,7 +33,7 @@ cur.execute("""SELECT count(*) FILTER (WHERE ai_title IS NOT NULL AND ai_title !
 r = cur.fetchone()
 print(f"📝 AI: {r['ai']}/{r['total']}")
 
-           
+
 print("\n🚩 RED FLAGS:")
 flags = 0
 cur.execute("SELECT count(*) as c FROM active_listings WHERE status='active' AND price_uah IS NULL")
@@ -42,8 +42,8 @@ if c > 0: print(f"  ❌ {c} без ціни"); flags += 1
 cur.execute("""SELECT count(*) as c FROM (SELECT url FROM active_listings WHERE status='active' AND url IS NOT NULL GROUP BY url HAVING count(*)>1) x""")
 c = cur.fetchone()['c']
 if c > 0: print(f"  ❌ {c} URL дублікатів"); flags += 1
-# Production backups are custom pg_dump files in this repository.  The former
-# legacy path produced a false "older than 48h" alarm despite a fresh backup.
+
+
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 backups = glob.glob(os.path.join(project_root, "backups", "production", "*.dump"))
 if not backups: print("  ❌ НЕМАЄ БЕКАПІВ"); flags += 1

@@ -41,8 +41,8 @@ def main():
  try:
   lock=SheetsLock('manual_ingest'); lock.__enter__()
  except RuntimeError as exc:
-  # Cleaning or a parser may be finishing a single atomic Sheet write.  The
-  # next 30-minute run is safe; launchd must not report this as a failed job.
+
+
   print(f'manual_ingest=busy reason={exc}')
   return
  try:

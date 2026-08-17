@@ -19,10 +19,10 @@ def collect(source: str, operation: str, dry_run: bool, refresh_existing: bool =
     try:
         entries = parser.collect_listing_urls()
         known = set() if dry_run else existing_external_ids(conn, source, operation)
-        # Do not rewrite historic production rows when intake geography or
-        # price rules change. Cleaning remains responsible for their status.
-        # A full coverage pass must re-fetch known cards too: price, status,
-        # description and commission can change without a new external ID.
+
+
+
+
         if not refresh_existing:
             entries = [entry for entry in entries if entry['external_id'] not in known]
         for entry in entries:
@@ -36,8 +36,8 @@ def collect(source: str, operation: str, dry_run: bool, refresh_existing: bool =
             if listing.property_type != 'Будинок':
                 continue
             minimum_usd = 2_000 if operation == 'rent' else 100_000
-            # New house intake only. Existing production rows are never
-            # retrospectively deleted or reclassified by this policy.
+
+
             if listing.price_usd is None or listing.price_usd < minimum_usd:
                 continue
             parsed += 1

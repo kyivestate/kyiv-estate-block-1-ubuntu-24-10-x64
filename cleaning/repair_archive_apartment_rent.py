@@ -27,7 +27,7 @@ def main():
             if len(row)>3 and str(row[3]).strip(): locations[str(row[3]).strip()].append(number)
         unknown=set(locations)-set(expected_by_id)
         if unknown: raise RuntimeError(f'Unknown archive IDs; refusing repair: {list(unknown)[:5]}')
-        # Retain the first row per ID; remove all later positions from bottom to top.
+
         duplicate_positions=sorted((pos for positions in locations.values() for pos in positions[1:]),reverse=True)
         for offset in range(0,len(duplicate_positions),100):
             batch=duplicate_positions[offset:offset+100]

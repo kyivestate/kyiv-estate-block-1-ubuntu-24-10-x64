@@ -10,9 +10,6 @@ trap 'rmdir "$LOCK"' EXIT INT TERM
 cd /Users/admin/Projects/real-estate-platform/telegram-bot
 source venv/bin/activate
 if [ "$backfill_active" -eq 1 ]; then
-  # Keep availability checks alive during long full crawls without doubling
-  # the normal source load.  The normal per-scope limit returns automatically
-  # as soon as all full-backfill locks disappear.
   export CLEANING_LIMIT_PER_SCOPE="${CLEANING_LIMIT_DURING_BACKFILL:-10}"
   echo "cleaning_mode=reduced_during_full_backfill limit_per_scope=$CLEANING_LIMIT_PER_SCOPE"
 fi

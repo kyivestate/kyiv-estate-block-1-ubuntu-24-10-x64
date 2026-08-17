@@ -67,7 +67,7 @@ def sync_book(sheet_id: str, include_inactive: bool) -> None:
 
 
 def main() -> None:
-    # The shared process lock prevents simultaneous writer scripts across all Block 1 catalogs.
+
     with SheetsLock('findly_sheets_sync'):
         sync_book(cfg.active_sheet_id, include_inactive=False)
         if cfg.lifecycle_sheet_id:

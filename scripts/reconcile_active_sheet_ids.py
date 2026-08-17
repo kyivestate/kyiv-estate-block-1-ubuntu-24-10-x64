@@ -133,9 +133,9 @@ def write_rows(worksheet, start_row: int, rows: list[list[str]], width: int) -> 
 def reconcile_tab(connection, worksheet, catalog: str, operation: str, business_width: int, approved_width: int, comment_index: int) -> dict:
     if worksheet.col_count > approved_width:
         retry(lambda: worksheet.resize(cols=approved_width))
-    # Reading every business cell in the six large tabs made this guard almost
-    # as expensive as a full sync.  Set reconciliation only needs IDs and the
-    # human-owned comment column.  Fetch those two narrow ranges in one call.
+
+
+
     comment_column = column_name(comment_index + 1)
     id_values, comment_values = retry(lambda: worksheet.batch_get(
         ["A:A", f"{comment_column}:{comment_column}"], value_render_option="FORMULA",
@@ -161,9 +161,9 @@ def reconcile_tab(connection, worksheet, catalog: str, operation: str, business_
     expected_rows = rows_for(catalog, operation)
     expected = {str(row["id"]): row_values(catalog, row) for row in expected_rows}
     stale = [position for identifier, position in by_id.items() if identifier not in expected]
-    # Commercial tabs deliberately retain physical rows because deleting an
-    # IMAGE-heavy grid can stall Sheets.  Apartments and houses use actual
-    # row deletion to avoid blank gaps in the operator-facing tabs.
+
+
+
     cleared = (
         clear_rows(worksheet, stale + duplicates, approved_width)
         if catalog == "commercial"
@@ -194,9 +194,9 @@ def main() -> int:
         "commercial": (retry(lambda: client.open_by_key(commercial["active"]["id"])), COMMERCIAL_HEADERS, len(COMMERCIAL_HEADERS) + 2),
     }
     result: dict[str, dict] = {}
-    # A full commercial field sync can legitimately take more than 15 minutes
-    # on a throttled Google API.  Queue behind it instead of treating that as a
-    # failed exactness check.
+
+
+
     with SheetsLock("reconcile_active_sheet_ids", wait_seconds=1800), psycopg2.connect(**DB) as connection:
         for catalog, (book, headers, approved_width) in books.items():
             result[catalog] = {}

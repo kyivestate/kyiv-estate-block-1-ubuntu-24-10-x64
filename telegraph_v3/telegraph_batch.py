@@ -33,17 +33,17 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 TELEGRAPH_API = "https://api.telegra.ph"
-# Telegraph accepts public requests but can throttle bursts.  This short,
-# configurable pause maximises normal throughput; create_or_edit() still
-# honours any server-provided FLOOD_WAIT before retrying.
+
+
+
 TELEGRAPH_PAGE_INTERVAL_SECONDS = float(os.getenv("TELEGRAPH_PAGE_INTERVAL_SECONDS", "1.5"))
-# A long provider cooldown must never hold the only publisher process hostage.
-# It is persisted as retry_after and a later cycle resumes safely instead.
+
+
 MAX_INLINE_FLOOD_WAIT_SECONDS = int(os.getenv("TELEGRAPH_MAX_INLINE_FLOOD_WAIT_SECONDS", "15"))
 
-# Publishing a complete bilingual card requires several HTTPS calls (translation
-# plus two Telegraph pages).  Reusing connections avoids a fresh DNS/TLS
-# negotiation for every call, which was the dominant bottleneck in large runs.
+
+
+
 HTTP = requests.Session()
 HTTP.mount("https://", HTTPAdapter(pool_connections=32, pool_maxsize=32, max_retries=0))
 ACCOUNT_FILE = ROOT / "telegraph_v3" / "data" / "telegraph-account.json"
@@ -202,7 +202,7 @@ def retry(call, attempts: int = 4):
             error = exc
             if attempt + 1 < attempts:
                 time.sleep(1.5 * (2 ** attempt))
-    raise error  # type: ignore[misc]
+    raise error
 
 
 def translate(conn, text: str) -> str:
@@ -215,9 +215,9 @@ def translate(conn, text: str) -> str:
         if cached:
             return cached[0]
     parts = []
-    # The free Google endpoint uses GET; a Ukrainian paragraph can expand to a
-    # URL that it rejects. Preserve every word by translating small natural
-    # chunks instead of truncating at an unsafe request length.
+
+
+
     chunks: list[str] = []
     for paragraph in text.splitlines() or [text]:
         words = paragraph.split()
@@ -385,8 +385,8 @@ def content(row: dict[str, Any], language: str, title: str, description: str, ph
 def create_or_edit(token: str, url: str | None, title: str, nodes: list[dict[str, Any]]) -> str:
     payload = {"access_token": token, "title": title[:256], "author_name": "KYIV ESTATE", "content": json.dumps(nodes, ensure_ascii=False), "return_content": False}
     endpoint = "/editPage/" + url.rsplit("/", 1)[-1] if url else "/createPage"
-    # Telegraph does not document a fixed rate.  Use a short normal spacing for
-    # throughput, but obey an explicit FLOOD_WAIT immediately when it appears.
+
+
     error = None
     for attempt in range(4):
         result = retry(lambda: HTTP.post(TELEGRAPH_API + endpoint, json=payload, timeout=45))
@@ -423,18 +423,18 @@ def fetch_batch(conn, limit: int, catalogs: Iterable[str], refresh: bool = False
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         for catalog in catalogs:
             table = PUBLICATION_TABLES[catalog]
-            # jsonb lets one renderer safely consume the distinct production schemas.
-            # Initial mass publishing must always advance to new listings.
-            # Page refreshes are explicit (`--refresh`), so a routine source
-            # touch in Block 1 cannot consume Cloudinary/Telegraph capacity by
-            # repeatedly rebuilding an already-published page.
+
+
+
+
+
             work_filter = "TRUE" if refresh else """(
                 p.listing_id IS NULL
                 OR (p.status IN ('pending','retry') AND (p.retry_after IS NULL OR p.retry_after <= now()))
             )"""
             if retry_failed and not refresh:
-                # Retry transient Cloudinary-era failures in the free source
-                # mode, but never loop forever on a listing with no images.
+
+
                 work_filter = """(
                     p.listing_id IS NULL
                     OR (p.status IN ('pending','retry') AND (p.retry_after IS NULL OR p.retry_after <= now()))
@@ -442,10 +442,10 @@ def fetch_batch(conn, limit: int, catalogs: Iterable[str], refresh: bool = False
                 )"""
             archive_filter = ""
             if media_mode == "archive" and not refresh:
-                # Use the durable source_url index.  This intentionally
-                # requires every HTTPS listing photo to be present, matching
-                # the promise that a Telegraph page never references a
-                # temporary source image.
+
+
+
+
                 archive_filter = """
                     AND EXISTS (
                         SELECT 1
@@ -471,9 +471,9 @@ def fetch_batch(conn, limit: int, catalogs: Iterable[str], refresh: bool = False
                 LIMIT %s
             """, (catalog, catalog, per_catalog))
             buckets[catalog] = [dict(item["listing"]) for item in cur.fetchall()]
-    # Keep the three catalogues fair when all have ready records, but let a
-    # productive catalogue consume unused slots when another is still being
-    # archived.  This prevents 16/24 empty batch slots seen in production.
+
+
+
     while len(rows) < limit and any(buckets.values()):
         for catalog in catalogs:
             if buckets.get(catalog):
@@ -487,15 +487,15 @@ def record_failure(conn, row: dict[str, Any], error: Exception) -> None:
     """Persist one retryable failure without affecting the source listing."""
     message = str(error)[:1800]
     flood = FLOOD_WAIT.search(message)
-    # A source image that OLX has deleted cannot be made durable. It remains
-    # visible for audit but is not retried until the authoritative listing is
-    # updated with new images.
+
+
+
     terminal = "Resource not found" in message or "Listing has no usable HTTPS photos" in message
     if flood:
         retry_after = datetime.now(timezone.utc) + timedelta(seconds=int(flood.group(1)) + 15)
     elif "Media archive pending" in message:
-        # The archive runs independently every few minutes; avoid selecting
-        # the same listing on every publisher tick while its photos arrive.
+
+
         retry_after = datetime.now(timezone.utc) + timedelta(minutes=10)
     else:
         retry_after = None
@@ -535,16 +535,16 @@ def publish_one(conn, row: dict[str, Any], dry_run: bool, media_mode: str) -> di
     if dry_run:
         return {"status": "dry-run", "listing_id": listing_id, "photos": len(original_photos)}
     stable = publication_media(conn, original_photos, catalog, listing_id, media_mode)
-    # The branding image is already durable and shared by all pages; do not
-    # require an image-hosting account in the free source-photo mode.
+
+
     logo = logo_url(conn) if media_mode == "cloudinary" else ""
     ua_title = clean_title(row.get("ai_title") or row.get("title"), listing_id)
     ua_text = agency_description(row)
     en_title, en_text = translate(conn, ua_title), translate(conn, ua_text)
     token = telegraph_token()
-    # Keep page writes sequential. Telegraph has applied a provider-wide
-    # cooldown after parallel bursts; a stable UA->EN sequence is resumable
-    # and retains the reciprocal language link on every newly created card.
+
+
+
     ua = create_or_edit(token, prior[0], ua_title, content(row, "ua", ua_title, ua_text, stable, logo))
     en = create_or_edit(token, prior[1], en_title, content(row, "en", en_title, en_text, stable, logo, ua))
     with conn.cursor() as cur:
@@ -573,8 +573,8 @@ def prewarm_translations(rows: list[dict[str, Any]], workers: int) -> None:
 
     with ThreadPoolExecutor(max_workers=min(workers, len(rows)), thread_name_prefix="translation") as pool:
         for future in [pool.submit(warm, row) for row in rows]:
-            # Failed cache warming is harmless: publish_one will make the
-            # normal retrying translation call and record any real failure.
+
+
             try:
                 future.result()
             except Exception:
@@ -647,9 +647,9 @@ def main() -> None:
                 return
         catalogs = args.catalog or list(PUBLICATION_TABLES)
         usage_before = cloudinary_credit_usage() if args.media_mode == "cloudinary" else None
-        # This is deliberately below the provider's hard limit: it ensures a
-        # page is never created with transient source images after storage is
-        # exhausted. The launcher will simply become idle at the ceiling.
+
+
+
         if usage_before and usage_before["used"] >= min(args.credit_ceiling, usage_before["limit"]):
             print(json.dumps({"selected": 0, "summary": {"quota_reached": 1}, "cloudinary_credits": usage_before}, ensure_ascii=False))
             return
@@ -666,22 +666,22 @@ def main() -> None:
         elif args.publish_workers == 1:
             results = [publish_task(row, args.media_mode) for row in rows]
         else:
-            # A small fixed pool increases throughput while retaining one
-            # transaction per listing.  Provider cooldowns are persisted by
-            # each task, so a single delayed page cannot stall the batch.
+
+
+
             with ThreadPoolExecutor(max_workers=min(args.publish_workers, len(rows)), thread_name_prefix="publisher") as pool:
                 results = [future.result() for future in [pool.submit(publish_task, row, args.media_mode) for row in rows]]
         summary = {state: sum(item["status"] == state for item in results) for state in {item["status"] for item in results}}
         output: dict[str, Any] = {"selected": len(rows), "summary": summary, "results": results, "media_mode": args.media_mode}
         if usage_before:
             output["cloudinary_credits_before"] = usage_before
-    # Run after the transaction closes: Google Sheets never participates in the
-    # PostgreSQL transaction, and the dedicated writer still owns SheetsLock.
+
+
     if not args.dry_run and not args.no_sync and summary.get("published", 0):
         completed = subprocess.run([sys.executable, str(ROOT / "telegraph_v3" / "sync_to_sheets.py")], text=True, capture_output=True)
         output["sheets_sync"] = json.loads(completed.stdout) if completed.returncode == 0 and completed.stdout.strip() else {"ok": False, "error": completed.stderr.strip()[:1000]}
-    # A usage check after the batch makes the persistent runner auditable and
-    # lets the next invocation stop safely at the configured ceiling.
+
+
     if not args.dry_run and args.media_mode == "cloudinary":
         output["cloudinary_credits_after"] = cloudinary_credit_usage()
     print(json.dumps(output, ensure_ascii=False))

@@ -25,30 +25,30 @@ def extract_price_and_currency(raw: str) -> tuple[float | None, str]:
     """Parse prices like '45 000 грн/міс', '2 400 $/міс', '95000 $', '1500000 грн'."""
     if not raw: return None, ""
 
-                                              
+
     currency = ""
     if "$" in raw or "USD" in raw.upper(): currency = "USD"
     elif "€" in raw or "EUR" in raw.upper(): currency = "EUR"
     elif "грн" in raw.lower() or "UAH" in raw.upper() or "₴" in raw: currency = "UAH"
 
-                                                  
+
     raw_clean = re.sub(r"[^\d.,]", "", raw.replace("\xa0", "").replace(" ", ""))
 
-                           
-                                                       
-                                 
+
+
+
     raw_clean = raw_clean.strip(".,")
 
     if not raw_clean: return None, currency
 
-                                                                  
-                                                   
+
+
     if raw_clean.count(".") > 1:
         raw_clean = raw_clean.replace(".", "")
     elif raw_clean.count(",") > 1:
         raw_clean = raw_clean.replace(",", "")
 
-                                                    
+
     raw_clean = raw_clean.replace(",", ".")
 
     try:
@@ -57,10 +57,10 @@ def extract_price_and_currency(raw: str) -> tuple[float | None, str]:
     except ValueError:
         pass
 
-                                             
+
     nums = re.findall(r"[\d]+", raw)
     if nums:
-                                                                 
+
         joined = "".join(nums)
         try:
             val = float(joined)

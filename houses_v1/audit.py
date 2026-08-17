@@ -14,9 +14,9 @@ def main():
     with psycopg2.connect(host='localhost', port=5432, dbname='real_estate', user='admin') as conn, conn.cursor() as cur:
         report['apartments_non_apartment_rows'] = scalar(cur, "SELECT count(*) FROM active_listings WHERE property_type <> 'Квартира'")
         report['houses_non_house_rows'] = scalar(cur, "SELECT count(*) FROM houses_listings WHERE property_type <> 'Будинок'")
-        # An identity may legitimately remain in the historical (inactive) side
-        # of the other contour after a reclassification.  It is a split defect
-        # only when both production rows are currently active.
+
+
+
         report['shared_active_identity'] = scalar(cur, """SELECT count(*) FROM active_listings apartment JOIN houses_listings house
             ON apartment.source=house.source AND apartment.external_id=house.external_id
             WHERE apartment.status='active' AND house.status='active'""")

@@ -36,8 +36,8 @@ def source_cards(contour: str, source: str, operation: str) -> list[dict]:
     try:
         return parser.collect_listing_urls()[:20]
     finally:
-        # Apartment/house parsers receive a shared HTTP client and do not own
-        # a ``close`` method; commercial parsers do.  Close whichever exists.
+
+
         closer = getattr(parser, "close", None) or getattr(parser, "http", None).close
         closer()
 
@@ -95,7 +95,7 @@ def telegraph_audit(conn) -> dict:
             try:
                 response = session.get(url, timeout=25)
                 response.raise_for_status()
-                # Telegraph keeps image addresses in the rendered HTML.
+
                 actual = response.text.count('<img')
                 if actual < expected:
                     image_shortfall.append({"catalog": catalog, "listing_id": listing_id, "locale": locale, "expected": expected, "actual": actual})

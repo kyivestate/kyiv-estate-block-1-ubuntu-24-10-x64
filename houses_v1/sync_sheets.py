@@ -47,8 +47,8 @@ def cells_match(existing, expected):
 
 
 def rows_match(existing, expected):
-    # IMAGE rendering and timestamps can change representation without a
-    # business-data change.  AD/Коментарі is user-owned and not compared here.
+
+
     ignored = {2, 27, 28}
     return all(cells_match(existing[index] if index < len(existing) else '', expected[index])
                for index in range(29) if index not in ignored)
@@ -108,7 +108,7 @@ def main():
         lock = SheetsLock('houses_sheets_sync', wait_seconds=900)
         lock.__enter__()
     except RuntimeError as exc:
-        # Another approved writer owns the shared lock.  A later scheduled run is safe.
+
         print(f'sync=busy reason={exc}')
         return
     try:
@@ -123,10 +123,10 @@ def main():
                     if sheet.col_count > len(HEADERS) + 2:
                         sheet.resize(cols=len(HEADERS) + 2)
                     header = sheet.row_values(1)
-                    # Block 3 owns the two appended Telegraph columns.  They
-                    # are compatible with the houses schema and must never
-                    # make the Section 1.2 writer refuse an otherwise valid
-                    # sheet or overwrite those URLs.
+
+
+
+
                     if header and header[:len(HEADERS)] != HEADERS:
                         raise RuntimeError(f'Unexpected header in {tab}; refusing to overwrite')
                     if not header: sheet.update('A1:AD1', [HEADERS], value_input_option='RAW')
@@ -151,13 +151,13 @@ def main():
                         found = by_id.get(values[0])
                         if found is None: appends.append(values)
                         elif not rows_match(found[1], values):
-                            # AD is "Коментарі" and is edited only by a user.
+
                             updates.append({'range':f'A{found[0]}:AC{found[0]}','values':[values[:29]]})
                     for start in range(0, len(updates), 50): sheet.batch_update(updates[start:start+50], value_input_option='USER_ENTERED')
                     stale_positions = [number for identifier, (number, _) in by_id.items() if identifier not in expected_ids]
-                    # Delete in descending order to keep the active tabs dense.
-                    # Comments were captured above and surviving rows move with
-                    # their comment cell, so no manual note loses its listing.
+
+
+
                     removed = delete_rows(sheet, stale_positions + duplicate_positions + orphan_positions)
                     current_after_delete = sheet.get_all_values(value_render_option='FORMULA')
                     required_rows = len(current_after_delete) + len(appends) + 10

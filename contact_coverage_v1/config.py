@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-# This loads credentials only to read Block 1 data. It never changes a source table.
+
 load_dotenv(Path(__file__).parents[1] / ".env")
 
 

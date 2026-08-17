@@ -83,8 +83,8 @@ def build_title(row):
     elif district:
         parts.append(f"у {district} районі")
     else:
-        # Keep the fallback title specific and above the production minimum
-        # when a sparse source does not provide district or ЖК information.
+
+
         parts.append("у Києві")
     return " ".join(parts)[:160]
 
@@ -191,9 +191,9 @@ def fallback_detailed_description(row, source):
     if details:
         result = prefix + "\n\nДеталі об'єкта:\n" + details
     else:
-        # Some source listings legitimately expose only structured fields.
-        # State that limitation instead of inventing amenities or leaving an
-        # empty AI card, while retaining every confirmed fact from the row.
+
+
+
         result = prefix + ("\n\nУ першоджерелі немає розгорнутого опису. "
                            "Наведено лише підтверджені характеристики об'єкта.")
     recap = factual_recap(row)

@@ -23,7 +23,7 @@ def main():
   header=ws.row_values(1)
   if header and header != MANUAL_HEADERS: raise RuntimeError(f'{catalog}: unexpected manual header')
   if not header: ws.update('A1:N1',[MANUAL_HEADERS],value_input_option='RAW')
-  # Always maintain ten blank input rows after existing manual data.
+
   rows=ws.get_all_values(); last=max((i for i,row in enumerate(rows[1:],2) if any(str(v).strip() for v in row)),default=1)
   required=last+10
   if ws.row_count < required: ws.add_rows(required-ws.row_count)

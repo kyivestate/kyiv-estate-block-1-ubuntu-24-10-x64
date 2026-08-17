@@ -121,5 +121,5 @@ body{{margin:0;background:#f6f7f9;color:#18202a;font:16px -apple-system,BlinkMac
 
 
 if __name__ == "__main__":
-    # The router exposes only this read-only service on its dedicated media port.
+
     app.run(host="0.0.0.0", port=int(os.getenv("MEDIA_ARCHIVE_PORT", "8787")), threaded=True)

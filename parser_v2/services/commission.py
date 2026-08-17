@@ -56,8 +56,8 @@ def _extract(text: str) -> str | None:
             value = float(match.group(1).replace(" ", "").replace(",", "."))
             if value > 0:
                 return f"Комісія {_number(match.group(1))} {_currency(match.group(2))}"
-    # Rieltor's structured label often sends "Комісія 2" without a percent
-    # sign.  This rule is restricted to a field containing nothing else.
+
+
     match = _BARE_STRUCTURED.match(text)
     if match:
         value = float(match.group(1).replace(",", "."))

@@ -1,7 +1,5 @@
 BEGIN;
 
--- Section X owns only contact_coverage_* tables. It has no foreign keys to
--- production catalogs so it can be disabled or rebuilt without affecting them.
 CREATE TABLE IF NOT EXISTS contact_coverage_listings (
     id BIGSERIAL PRIMARY KEY,
     catalog TEXT NOT NULL CHECK (catalog IN ('apartments', 'houses', 'commercial')),

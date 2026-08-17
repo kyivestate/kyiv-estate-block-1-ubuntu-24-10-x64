@@ -64,7 +64,7 @@ class OlxParser:
 
     def _extract(self, html: str, url: str) -> dict:
         soup = BeautifulSoup(html, "lxml"); d: dict = {"url": url}
-                 
+
         for s in soup.select('script[type="application/ld+json"]'):
             try:
                 ld = json.loads(s.string or "")
@@ -75,22 +75,22 @@ class OlxParser:
                     imgs = ld.get("image", [])
                     if isinstance(imgs, list): d["photos"] = [i for i in imgs if isinstance(i, str)]
             except (json.JSONDecodeError, TypeError): pass
-              
+
         for tag, key in [("og:title", "title"), ("og:image", "photo_url")]:
             el = soup.find("meta", property=tag)
             if el: d.setdefault(key, el.get("content", ""))
         md = soup.find("meta", attrs={"name": "description"})
         if md: d.setdefault("description", md.get("content", ""))
-            
+
         h1 = soup.select_one("h1")
         if h1: d.setdefault("title", clean_text(h1.get_text()))
-               
+
         pe = soup.select_one('h3[class*="price"]') or soup.select_one('div[data-testid="ad-price-container"] h3')
         if pe: d.setdefault("price_raw", clean_text(pe.get_text()))
         if not d.get("price_raw"):
             pe2 = soup.find("span", string=re.compile(r"грн|uah|\$|€", re.IGNORECASE))
             if pe2: d["price_raw"] = clean_text(pe2.get_text())
-                
+
         for p in soup.select('li[class*="param"] p, ul[class*="params"] li, p.css-odhutu, [data-testid*="parameter"] p'):
             t = clean_text(p.get_text()); tl = t.lower()
             if "кімнат" in tl or "комнат" in tl:
@@ -108,12 +108,12 @@ class OlxParser:
                 else:
                     m = re.search(r"(\d+)", t)
                     if m: d.setdefault("floor", m.group(1))
-                     
+
         db = soup.select_one('div[data-cy="ad_description"] div') or soup.select_one('div[class*="description"]')
         if db:
             fd = clean_text(db.get_text())
             if len(fd) > len(d.get("description", "")): d["description"] = fd
-                  
+
         le = soup.select_one('a[href*="map"] span') or soup.select_one('p[class*="location"]')
         if le: d["address"] = clean_text(le.get_text())
 
@@ -167,10 +167,10 @@ class OlxParser:
         if d.get("floor") and d.get("floors_total") and int(float(d["floor"])) > int(float(d["floors_total"])):
             d.pop("floor", None)
             d.pop("floors_total", None)
-                         
+
         if not d.get("photos"):
             d["photos"] = [i.get("src","") for i in soup.select('div[class*="photo"] img[src], div[class*="swiper"] img[src]') if i.get("src","").startswith("http")][:20]
-                 
+
         ue = soup.select_one('div[class*="user-info"] a, h4[class*="seller"]')
         if ue: d["contact_name"] = clean_text(ue.get_text())
         return d

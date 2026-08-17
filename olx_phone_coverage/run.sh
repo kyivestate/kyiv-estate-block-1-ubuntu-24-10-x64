@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 
 cd /Users/admin/Projects/real-estate-platform/telegram-bot

@@ -95,7 +95,7 @@ def source_rows(path: Path) -> tuple[dict[str, list[str]], dict[str, Any]]:
         if not phones:
             invalid_phone_rows += 1
             continue
-        # OLX tokens are base-62 style and therefore case-sensitive.
+
         phone_sets[ext].add(tuple(phones))
         current = by_external.setdefault(ext, [])
         for phone in phones:
@@ -266,9 +266,9 @@ def sync_sheets(plan: list[dict[str, Any]]) -> dict[str, Any]:
                         updates.append({"range": f"{phone_column}{row_number}", "values": [[merged]]})
                 for start in range(0, len(updates), 100):
                     batch = updates[start:start + 100]
-                    # gspread qualifies ranges in place.  A transient retry
-                    # must receive a fresh payload or the sheet name is
-                    # prefixed repeatedly and Google rejects the range.
+
+
+
                     retry(lambda batch=batch: sheet.batch_update(copy.deepcopy(batch), value_input_option="RAW"))
                 report["cells_updated"] += len(updates)
                 report["by_tab"][f"{catalog}:{operation}"] = len(updates)

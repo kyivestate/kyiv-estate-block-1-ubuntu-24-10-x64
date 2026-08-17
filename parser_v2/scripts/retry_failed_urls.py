@@ -108,8 +108,8 @@ def retry_batch(limit: int, max_retries: int, dry_run: bool = False) -> Counter:
             _http, parser = clients[key]
             try:
                 raw, source_data = parser.fetch_and_parse(row["url"], row["external_id"])
-                # These are no longer recoverable fetch failures, not an error
-                # in the pipeline.  They should not consume future retry slots.
+
+
                 if raw.http_status in (404, 410):
                     raw.parse_status = "gone"
                     raw.error_message = f"HTTP {raw.http_status}"
@@ -146,8 +146,8 @@ def retry_batch(limit: int, max_retries: int, dry_run: bool = False) -> Counter:
             if index % 10 == 0 or index == len(candidates):
                 log.info("retry %d/%d: %s", index, len(candidates), dict(stats))
         if stats["parsed"] and not dry_run:
-            # Only rows recovered by this batch are eligible for the Active
-            # upsert; never turn a retry into an all-table rewrite.
+
+
             merged = merge_v2_into_active(conn, since=batch_started_at)
             conn.commit()
             stats["merged"] = merged

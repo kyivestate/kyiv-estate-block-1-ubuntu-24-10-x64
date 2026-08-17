@@ -24,8 +24,8 @@ CATALOGS = {
 def extract(text: str) -> list[str]:
     values: list[str] = []
     for raw in re.findall(PHONE_PATTERN, text or ''):
-        # PHONE_PATTERN contains a single outer capture; regexp output is a
-        # string in Python. Normalization rejects non-Ukrainian lengths.
+
+
         phone = normalize_phone(raw)
         digits = re.sub(r'\D', '', phone)
         if (digits.startswith('380') and len(digits) == 12) or (digits.startswith('0') and len(digits) == 10):

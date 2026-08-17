@@ -47,8 +47,8 @@ def main() -> None:
     sheets = build("sheets", "v4", credentials=creds, cache_discovery=False)
     props = sale_sheet(sheets, spreadsheet_id)
     columns = props["gridProperties"]["columnCount"]
-    # Telegraph UA/EN are intentionally appended by Block 3 and are not part
-    # of the commercial writer's business-field header list.
+
+
     canonical = len(HEADERS) + 2
     result = {"sheet": "Продаж", "rows": props["gridProperties"]["rowCount"], "columns": columns, "canonical_columns": canonical}
     if columns < canonical:
@@ -62,7 +62,7 @@ def main() -> None:
         print(json.dumps(result, ensure_ascii=False))
         return
     with SheetsLock("commercial_sale_layout_repair"):
-        # Read the grid again only after the writer lock has been acquired.
+
         props = sale_sheet(sheets, spreadsheet_id)
         columns = props["gridProperties"]["columnCount"]
         if columns <= canonical:
@@ -78,9 +78,9 @@ def main() -> None:
                 fields="id,name,webViewLink",
             ).execute()
         except Exception as exc:
-            # Do not silently perform a destructive repair without a recovery
-            # point.  The scheduled encrypted CSV snapshots are acceptable
-            # only when the operator explicitly selects one.
+
+
+
             local = args.verified_local_backup
             if not local or not local.is_file() or local.stat().st_size == 0:
                 raise RuntimeError("Drive copy failed and no verified local backup was supplied") from exc

@@ -1,4 +1,3 @@
-#!/bin/zsh
 set -euo pipefail
 project_dir="/Users/admin/Projects/real-estate-platform/telegram-bot"
 mkdir -p "$project_dir/logs"

@@ -1,4 +1,3 @@
-#!/bin/bash
 set -uo pipefail
 
 PROJECT="$HOME/Projects/real-estate-platform/telegram-bot"
@@ -86,8 +85,6 @@ while true; do
   LIVE_N="$(worker_count '[e]nrich_missing_live.py')"
   if background_ready && [ "$REBUILD_N" -eq 0 ] && [ "$FAST_N" -lt 4 ]; then
     AI_REMAIN="$(db_count "$AI_QUERY")"
-    # Do not strand the final small tail of a batch: even one listing without
-    # safe AI copy must be completed before it reaches the active sheet.
     if [ "$AI_REMAIN" -gt 0 ]; then
       for WORKER in 0 1 2 3; do
         if ! pgrep -f "[g]enerate_ai_fast.py --worker $WORKER --workers 4" >/dev/null 2>&1; then

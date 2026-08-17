@@ -63,7 +63,7 @@ async def collect(operation: str, dry_run: bool, fetch_contacts: bool) -> dict[s
                     if not dry_run:
                         save_item(conn, item, row, status)
                     if fetch_contacts and row['is_valid']:
-                        # This intentional operation is opt-in and never done in dry-run mode.
+
                         contact_status, contact = await source.phone(http, row['external_id'])
                         phone = normalize_phone((contact or {}).get('phone')) if contact_status == 200 else ''
                         if phone and not dry_run:

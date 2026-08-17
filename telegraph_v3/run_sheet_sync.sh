@@ -1,5 +1,3 @@
-#!/bin/zsh
-# Independent Sheet writer.  It never blocks the Telegraph publishing queue.
 set -euo pipefail
 
 project_dir="/Users/admin/Projects/real-estate-platform/telegram-bot"

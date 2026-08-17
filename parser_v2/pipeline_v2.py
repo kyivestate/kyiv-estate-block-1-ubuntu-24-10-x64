@@ -42,8 +42,8 @@ def run_parser(source: str, operation: str, dry_run: bool = False, property_type
                     except: conn.rollback()
             else:
                 nl = normalize_listing(raw, sd)
-                # A source catalogue can contain a promoted card of another
-                # property type.  Never merge it into the wrong contour.
+
+
                 if property_types is not None and nl.property_type not in property_types:
                     stats["filtered"] += 1
                     if not dry_run:
@@ -123,8 +123,8 @@ def _db_row_to_30_cols(r: dict) -> list[str]:
         str(r.get("url", "") or ""),
         str(r.get("title", "") or "")[:300],
         str(r.get("ai_title", "") or ""),
-        # Google Sheets permits 50,000 characters in a cell.  Keep a small
-        # margin but never silently reduce a listing description to a preview.
+
+
         str(r.get("description", "") or "")[:49000],
         str(r.get("ai_description", "") or "")[:49000],
         str(r.get("price_uah", "") or ""),
@@ -183,14 +183,14 @@ def run_sheets_restore():
                     except gspread.WorksheetNotFound:
                         ws = sp.add_worksheet(title=tab_name, rows=len(rows)+10, cols=30)
 
-                                                        
+
                     existing = ws.get_all_values()
                     url_to_row: dict[str, int] = {}
-                    for i, row in enumerate(existing[1:], start=2):               
-                        if len(row) >= 5 and row[4]:               
+                    for i, row in enumerate(existing[1:], start=2):
+                        if len(row) >= 5 and row[4]:
                             url_to_row[row[4]] = i
 
-                                                 
+
                     if not existing or existing[0] != SHEET_HEADERS_30:
                         ws.update("A1:AD1", [SHEET_HEADERS_30], value_input_option="RAW")
                         log.info("Header set for %s", tab_name)
@@ -207,7 +207,7 @@ def run_sheets_restore():
                         else:
                             appends.append(row_data)
 
-                                           
+
                     if updates:
                         for i in range(0, len(updates), 200):
                             chunk = updates[i:i+200]
@@ -215,11 +215,11 @@ def run_sheets_restore():
                             log.info("Tab %s: updated rows %d-%d", tab_name, i, i+len(chunk))
                             time.sleep(2)
 
-                                
+
                     if appends:
                         for i in range(0, len(appends), 500):
                             chunk = appends[i:i+500]
-                                                                                                       
+
                             log.info("Tab %s: appended %d rows", tab_name, len(chunk))
                             time.sleep(2)
 
@@ -275,7 +275,7 @@ def main():
             result = subprocess.run([sys.executable, "parser_v2/scripts/run_all.py"], cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             if result.returncode:
                 raise RuntimeError(f"canonical Sheets rebuild failed: {result.returncode}")
-                                                           
+
     log.info("Pipeline V2 complete.")
 
 if __name__ == "__main__": main()

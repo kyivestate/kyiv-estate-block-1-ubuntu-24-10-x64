@@ -36,9 +36,9 @@ def retry_google(operation, attempts=6):
         try:
             return operation()
         except (APIError, TransportError, RequestException, OSError) as exc:
-            # Authentication refreshes and DNS/socket creation happen before
-            # gspread can turn the failure into an APIError.  They are usually
-            # transient during a busy crawler pass, so retry them as well.
+
+
+
             status = getattr(getattr(exc, "response", None), "status_code", None)
             if isinstance(exc, APIError) and status not in {429, 500, 502, 503, 504}:
                 raise
@@ -64,8 +64,8 @@ def main():
     directory = Path(args.directory)
     directory.mkdir(parents=True, exist_ok=False)
     os.chmod(directory, 0o700)
-    # A backup is a read-only snapshot, but it must not be captured halfway
-    # through a writer's multi-range update.
+
+
     lock = SheetsLock("backup_sheets")
     lock.__enter__()
     atexit.register(lock.__exit__, None, None, None)

@@ -1,5 +1,3 @@
-#!/bin/zsh
-# launchd entry point: a rate-limit-aware, resumable production batch.
 set -euo pipefail
 
 project_dir="/Users/admin/Projects/real-estate-platform/telegram-bot"

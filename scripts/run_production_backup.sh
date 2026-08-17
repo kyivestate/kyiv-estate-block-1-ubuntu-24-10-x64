@@ -1,4 +1,3 @@
-#!/bin/bash
 set -euo pipefail
 
 PROJECT="${PROJECT:-$HOME/Projects/real-estate-platform/telegram-bot}"
@@ -24,8 +23,6 @@ mv "$DATABASE_TMP" "$DATABASE_FILE"
 DATABASE_TMP=""
 shasum -a 256 "$DATABASE_FILE" > "$DATABASE_FILE.sha256"
 SHEETS_BACKUP=""
-# A Sheets writer may legitimately be active when the nightly job starts.
-# Retry on a fresh temporary directory, then publish only a complete snapshot.
 for attempt in $(seq 1 30); do
   CANDIDATE="$BACKUP_ROOT/.sheets_${STAMP}_${attempt}.partial"
   if "$PYTHON" "$PROJECT/parser_v2/scripts/backup_sheets.py" --directory "$CANDIDATE"; then

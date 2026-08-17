@@ -19,7 +19,7 @@ from gspread.exceptions import APIError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from parser_v2.services.sheets_lock import SheetsLock  # noqa: E402
+from parser_v2.services.sheets_lock import SheetsLock
 
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / "houses_v1" / ".env")
@@ -64,9 +64,9 @@ def worksheet(client, catalog: str, operation: str):
 
 
 def indexes(ws, catalog: str):
-    # Commercial has 56 business fields plus exactly two approved Telegraph
-    # fields.  Never preserve a historic horizontal duplicate tail: it can
-    # push the workbook over Google's 10-million-cell limit.
+
+
+
     if catalog == "commercial" and ws.col_count > 58:
         retry(lambda: ws.resize(cols=58))
     header = retry(lambda: ws.row_values(1))
@@ -74,8 +74,8 @@ def indexes(ws, catalog: str):
     if missing:
         start = len(header) + 1
         required_columns = start + len(missing) - 1
-        # A new/legacy sheet can have fewer physical columns than its logical
-        # header needs.  Expand first; never overwrite an existing column.
+
+
         if ws.col_count < required_columns:
             retry(lambda: ws.add_cols(required_columns - ws.col_count))
         retry(lambda: ws.update(range_name=f"{column_name(start)}1:{column_name(start + len(missing)-1)}1", values=[missing], value_input_option="USER_ENTERED"))
@@ -114,7 +114,7 @@ def sync_group(cur, client, catalog, operation, items):
     for start in range(0, len(updates), 100):
         chunk = updates[start:start + 100]
         retry(lambda: ws.batch_update([change for _, change in chunk], value_input_option="USER_ENTERED"))
-    # Both language URLs must be written before the listing is marked synchronized.
+
     completed = {item["listing_id"] for item, _ in updates}
     rejected_ids = {item["listing_id"] for item in rejected}
     completed -= rejected_ids
@@ -132,7 +132,7 @@ def main():
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             items = pending(cur)
             groups = defaultdict(list)
-            # operation is taken from the authoritative ledger, never inferred from text.
+
             if items:
                 cur.execute("SELECT catalog,listing_id,operation FROM block3.publications WHERE status='published'")
                 operations = {(row["catalog"], row["listing_id"]): row["operation"] for row in cur.fetchall()}

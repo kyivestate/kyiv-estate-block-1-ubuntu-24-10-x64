@@ -1,4 +1,4 @@
-                      
+
 """Autonomous pipeline: enrich and synchronize sheets safely."""
 import sys, os, time, logging, re, copy
 from decimal import Decimal, InvalidOperation
@@ -25,9 +25,9 @@ HEADERS = [
 ]
 COL_WIDTHS = [55,95,80,60,55,80,200,250,200,300,250,80,70,70,50,60,50,50,120,70,180,150,100,80,130,120,90,130,130,100,200,200]
 
-                                                                  
-                    
-                                                                  
+
+
+
 def step1_db_cleanup():
     log.info("=" * 50)
     log.info("STEP 1: DB CLEANUP")
@@ -35,7 +35,7 @@ def step1_db_cleanup():
     cur = conn.cursor()
 
     sqls = [
-                          
+
         """UPDATE active_listings SET description = NULL
            WHERE description IS NOT NULL AND (
              LENGTH(TRIM(description)) < 10
@@ -44,28 +44,28 @@ def step1_db_cleanup():
              OR description LIKE '%%Будні з%%' OR description LIKE '%%будні з%%'
              OR description LIKE '%%Робочий час%%' OR description LIKE '%%Вихідні з%%'
            )""",
-                             
+
         """UPDATE active_listings SET ai_description = NULL
            WHERE ai_description IS NOT NULL AND (
              LENGTH(TRIM(ai_description)) < 20
              OR ai_description LIKE '%%Команда підтримки%%'
              OR ai_description LIKE '%%[Назва%%' OR ai_description LIKE '%%[Адреса%%'
            )""",
-                                           
+
         """UPDATE active_listings SET ai_title = NULL
            WHERE ai_title IS NOT NULL AND (
              ai_title LIKE '%%комісі%%' OR ai_title LIKE '%%брокер%%'
              OR ai_title LIKE '%%ріелтор%%' OR ai_title LIKE '%%агент%%'
            )""",
-                           
+
         "UPDATE active_listings SET commission = NULL WHERE LOWER(commission) IN ('false','none','0','no','ні','без','')",
         "UPDATE active_listings SET commission = 'Без комісії' WHERE LOWER(commission) LIKE '%%без комісі%%'",
-                    
+
         "UPDATE active_listings SET agent_type = NULL WHERE agent_type IN ('unknown','','none','None')",
-                               
+
         """UPDATE active_listings SET ai_description = REPLACE(ai_description, 'Продається', 'Здається в оренду')
            WHERE operation='rent' AND ai_description LIKE '%%Продається%%'""",
-                  
+
         "UPDATE active_listings SET price_eur = ROUND(price_uah / 51.52) WHERE price_eur IS NULL AND price_uah IS NOT NULL AND price_uah > 0",
         "UPDATE active_listings SET price_eur = ROUND(price_usd * 45.03 / 51.52) WHERE price_eur IS NULL AND price_usd IS NOT NULL AND price_usd > 0",
         "UPDATE active_listings SET price_usd = ROUND(price_uah / 45.03) WHERE price_usd IS NULL AND price_uah IS NOT NULL AND price_uah > 0",
@@ -81,9 +81,9 @@ def step1_db_cleanup():
     cur.close(); conn.close()
     log.info("✅ DB cleanup done")
 
-                                                                  
-                         
-                                                                  
+
+
+
 KYIV_DISTRICTS = {
     "Голосіївський": ["голосіїв","голосеев"],
     "Дарницький": ["дарниц"],
@@ -170,7 +170,7 @@ def step2_enrich():
         if idx % 10000 == 0:
             conn.commit()
             log.info("  [%d/%d] updated=%d", idx, len(rows), updated)
-              
+
     cur_w.execute("UPDATE active_listings SET commission='Не вказано' WHERE (commission IS NULL OR commission='') AND status='active' AND source NOT LIKE 'findly%%'")
     cur_w.execute("UPDATE active_listings SET agent_type='Не вказано' WHERE (agent_type IS NULL OR agent_type='') AND status='active' AND source NOT LIKE 'findly%%'")
     cur_w.execute("UPDATE active_listings SET city='Київ' WHERE (city IS NULL OR city='') AND status='active' AND source NOT LIKE 'findly%%'")
@@ -178,9 +178,9 @@ def step2_enrich():
     cur.close(); cur_w.close(); conn.close()
     log.info("✅ Enrichment done: %d rows updated", updated)
 
-                                                                  
-                                     
-                                                                  
+
+
+
 def safe_str(val, max_len=500):
     if val is None: return ""
     s = str(val).strip()
@@ -382,10 +382,10 @@ def _sheets_read_with_retry(callback, max_retries=5):
     raise RuntimeError("Google Sheets read failed after retries")
 
 def _cell_matches(existing, expected):
-    # USER_ENTERED strips the protective leading apostrophe used for phone
-    # numbers such as +380..., while the canonical row builder retains it.
-    # Compare the displayed values so phone-bearing rows are not rewritten on
-    # every 30-minute cycle.
+
+
+
+
     left = str(existing).strip().lstrip("'")
     right = str(expected).strip().lstrip("'")
     if left == right:
@@ -398,8 +398,8 @@ def _cell_matches(existing, expected):
 def _row_matches(existing, expected):
     if len(existing) < len(expected):
         return False
-    # AD/"Коментарі" belongs to the user.  It is intentionally never a
-    # parser-owned comparison or update field.
+
+
     return all(_cell_matches(existing[index], expected[index]) for index in range(len(expected)) if index not in {2, 27, 28, 29, 30, 31})
 
 def _format_due(tab):
@@ -471,8 +471,8 @@ def step3_sync_sheets():
             if existing_row is None:
                 appends.append(values)
             elif not _row_matches(existing_row[1], values):
-                # Preserve AD (manual comments) even when the parser changes
-                # price, description or AI content.
+
+
                 updates.extend([
                     {"range": f"A{existing_row[0]}:AC{existing_row[0]}", "values": [values[:29]]},
                     {"range": f"AE{existing_row[0]}:AF{existing_row[0]}", "values": [values[30:]]},
@@ -481,8 +481,8 @@ def step3_sync_sheets():
             if not _sheets_batch_update_with_retry(ws, updates[index:index + 50]):
                 raise RuntimeError(f"Could not update {tab} rows {index + 1}-{min(index + 50, len(updates))}")
         stale_positions = [position for identifier, (position, _) in rows_by_id.items() if identifier not in expected_ids]
-        # Descending deleteDimension keeps comments attached to their listing
-        # rows and prevents blank gaps in active operator workbooks.
+
+
         removed = _delete_sheet_rows(ws, stale_positions + duplicate_positions + orphan_positions)
         current_after_delete = _sheets_read_with_retry(lambda: ws.get_all_values(value_render_option="FORMULA"))
         required_rows = len(current_after_delete) + len(appends) + 10
@@ -491,7 +491,7 @@ def step3_sync_sheets():
         appended = _write_new_sheet_rows(ws, len(current_after_delete) + 1, appends)
         log.info("%s: updated_ranges=%d appended=%d removed=%d duplicate_ids=%d orphan_rows=%d", tab, len(updates), appended, removed, duplicate_ids, len(orphan_positions))
 
-                    
+
         if not _format_due(tab):
             log.info("  Formatting for %s is current", tab)
             log.info("  ✅ %s: %d active rows synced", tab, len(rows))
@@ -529,9 +529,9 @@ def step3_sync_sheets():
     cur.close(); conn.close()
     log.info("✅ Sheets rebuild complete")
 
-                                                                  
-                         
-                                                                  
+
+
+
 def step4_report():
     log.info("=" * 50)
     log.info("STEP 4: COVERAGE REPORT")
@@ -556,9 +556,9 @@ def step4_report():
         log.info(f"  {r[0]:10} {r[1]:6} {r[2]:>6} {r[3]:>5} {r[4]:>5} {r[5]:>5} {r[6]:>5} {r[7]:>5} {r[8]:>5} {r[9]:>5} {r[10]:>5} {r[11]:>5} {r[12]:>5}")
     cur.close(); conn.close()
 
-                                                                  
-      
-                                                                  
+
+
+
 if __name__ == "__main__":
     log.info("🚀 AUTONOMOUS PIPELINE STARTED")
     t0 = time.time()
@@ -568,10 +568,10 @@ if __name__ == "__main__":
         with SheetsLock("run_all", wait_seconds=900):
             step3_sync_sheets()
     except RuntimeError as exc:
-        # Apartment, house, commercial, archive and manual writers share one
-        # exclusive Sheets lock.  A busy writer is normal in a parallel cycle;
-        # keep the database pipeline healthy and let the next 30-minute pass
-        # perform the mirror sync.
+
+
+
+
         if str(exc).startswith("Sheets writer already running:"):
             log.warning("Sheets sync deferred: %s", exc)
         else:
