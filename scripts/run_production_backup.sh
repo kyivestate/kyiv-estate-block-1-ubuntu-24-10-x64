@@ -36,6 +36,6 @@ for attempt in $(seq 1 30); do
 done
 test -n "$SHEETS_BACKUP"
 touch "$PROJECT/.last_production_backup"
-find "$BACKUP_ROOT" -type f \( -name '*.dump' -o -name '*.sha256' \) -mtime +30 -delete
-find "$BACKUP_ROOT" -type d -name 'sheets_*' -mtime +30 -exec rm -rf {} +
+find "$BACKUP_ROOT" -type f \( -name '*.dump' -o -name '*.sha256' \) -mtime +14 -delete
+find "$BACKUP_ROOT" -type d -name 'sheets_*' -mtime +14 -exec rm -rf {} +
 printf '%s backup=%s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$DATABASE_FILE" >> "$PROJECT/logs/backup.log"
