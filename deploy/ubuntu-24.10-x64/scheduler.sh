@@ -15,7 +15,7 @@ run_due() {
   test -f "$state_dir/$task" && last="$(cat "$state_dir/$task")"
   if (( now - last < interval )); then return; fi
   printf '%s' "$now" > "$state_dir/$task"
-  flock -n "$lock_dir/$task.lock" "$runner" "$task" || true
+  flock -n "$lock_dir/$task.lock" "$runner" "$task" >> "$project/logs/$task.log" 2>&1 || true
 }
 
 while true; do
