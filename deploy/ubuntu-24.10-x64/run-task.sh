@@ -15,6 +15,5 @@ case "${1:?}" in
   statuses) exec "$project/scripts/run_status_checks.sh" ;;
   backup) exec "$project/scripts/run_production_backup.sh" ;;
   telegraph-sheets) exec "$project/telegraph_v3/run_sheet_sync.sh" ;;
-  media-archive) exec "$project/telegraph_v3/run_media_archive.sh" ;;
   *) exit 64 ;;
 esac

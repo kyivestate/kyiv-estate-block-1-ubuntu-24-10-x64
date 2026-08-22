@@ -57,7 +57,6 @@ def run_parser(source: str, operation: str, dry_run: bool = False, property_type
                     if cfg.parser.upload_photos and nl.photos:
                         cdns = photo_uploader.upload_batch(nl.photos[:cfg.parser.max_photos_per_listing], f"{nl.source}_{nl.external_id}")
                         if cdns: nl.cdn_photos = cdns; nl.cdn_photo_url = cdns[0]; nl.sheet_image_formula = f'=IMAGE("{cdns[0]}")'
-                    elif nl.photo_url: nl.sheet_image_formula = f'=IMAGE("{nl.photo_url}")'
                     if not dry_run:
                         try:
                             rid = save_raw_listing(conn, raw); nl.raw_listing_id = rid
