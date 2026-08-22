@@ -2,6 +2,7 @@
 set -euo pipefail
 
 project="${KYIV_ESTATE_HOME:?}"
+export PGPASSWORD="${PG_PASSWORD:-${POSTGRES_PASSWORD:-}}"
 runner="$project/deploy/ubuntu-24.10-x64/run-task.sh"
 state_dir=/var/lib/kyiv-estate/scheduler
 lock_dir=/var/lib/kyiv-estate/locks

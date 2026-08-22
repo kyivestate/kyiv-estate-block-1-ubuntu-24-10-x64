@@ -2,6 +2,7 @@
 set -uo pipefail
 
 PROJECT="${KYIV_ESTATE_HOME:?}"
+export PGPASSWORD="${PG_PASSWORD:-${POSTGRES_PASSWORD:-}}"
 LOCKDIR=/tmp/kyiv_estate_guard.lock
 
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
