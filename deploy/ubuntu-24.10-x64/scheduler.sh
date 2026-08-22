@@ -4,7 +4,8 @@ set -euo pipefail
 project="${KYIV_ESTATE_HOME:?}"
 runner="$project/deploy/ubuntu-24.10-x64/run-task.sh"
 state_dir=/var/lib/kyiv-estate/scheduler
-mkdir -p "$state_dir"
+lock_dir=/var/lib/kyiv-estate/locks
+mkdir -p "$state_dir" "$lock_dir"
 
 run_due() {
   local task="$1" interval="$2" now last
@@ -13,7 +14,7 @@ run_due() {
   test -f "$state_dir/$task" && last="$(cat "$state_dir/$task")"
   if (( now - last < interval )); then return; fi
   printf '%s' "$now" > "$state_dir/$task"
-  flock -n "/run/kyiv-estate-$task.lock" "$runner" "$task" || true
+  flock -n "$lock_dir/$task.lock" "$runner" "$task" || true
 }
 
 while true; do
