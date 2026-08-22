@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import random
 import sys
@@ -253,7 +254,7 @@ def sync_tab(ws, rows: list[dict], allow_delete: bool) -> dict:
 
     updated = update_rows(ws, updates)
     removed = 0
-    if allow_delete and expected:
+    if allow_delete and expected and os.getenv("PRESERVE_EXISTING_SHEET_ROWS", "").lower() not in {"1", "true", "yes"}:
         stale = [position for identifier, (position, _) in by_id.items() if identifier not in expected] + duplicate_positions + orphan_positions
         removed = delete_rows(ws, stale)
     current_after_delete = sheets_retry(lambda: ws.get_all_values(value_render_option="FORMULA"))

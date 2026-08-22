@@ -28,7 +28,6 @@ while true; do
   run_due empty-rows 600 &
   run_due statuses 1800 &
   run_due telegraph-sheets 300 &
-  run_due backup 7200 &
   wait
   sleep 30
 done

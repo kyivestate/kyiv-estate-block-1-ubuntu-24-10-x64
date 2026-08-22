@@ -480,7 +480,7 @@ def step3_sync_sheets():
         for index in range(0, len(updates), 50):
             if not _sheets_batch_update_with_retry(ws, updates[index:index + 50]):
                 raise RuntimeError(f"Could not update {tab} rows {index + 1}-{min(index + 50, len(updates))}")
-        stale_positions = [position for identifier, (position, _) in rows_by_id.items() if identifier not in expected_ids]
+        stale_positions = [] if os.getenv("PRESERVE_EXISTING_SHEET_ROWS", "").lower() in {"1", "true", "yes"} else [position for identifier, (position, _) in rows_by_id.items() if identifier not in expected_ids]
 
 
         removed = _delete_sheet_rows(ws, stale_positions + duplicate_positions + orphan_positions)

@@ -154,7 +154,7 @@ def main():
 
                             updates.append({'range':f'A{found[0]}:AC{found[0]}','values':[values[:29]]})
                     for start in range(0, len(updates), 50): sheet.batch_update(updates[start:start+50], value_input_option='USER_ENTERED')
-                    stale_positions = [number for identifier, (number, _) in by_id.items() if identifier not in expected_ids]
+                    stale_positions = [] if os.getenv('PRESERVE_EXISTING_SHEET_ROWS', '').lower() in {'1', 'true', 'yes'} else [number for identifier, (number, _) in by_id.items() if identifier not in expected_ids]
 
 
 
